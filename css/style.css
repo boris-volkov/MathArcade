@@ -1,0 +1,137 @@
+/* Layout / typography */
+body {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  background: #2b2e30;
+  color:#c4f2f2
+}
+
+h1 { margin: 0.5rem 0; }
+
+#question {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  margin: 1rem 0;
+  text-align: center;
+}
+
+#answer {
+  font-size: 1.5rem;
+  text-align: center;
+  width: 8ch;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #8aa1a4;
+  border-radius: 10px;
+  background: #312c2c;
+  color: #b7f7b7;
+}
+
+#answer.wrong {
+  background: #de6b6b;
+  border-color: #282222;
+}
+
+/* Responsive numpad */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(64px, 1fr));
+  gap: 10px;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+.numpad button {
+  font-size: 1.4rem;
+  padding: 0.9rem;
+  border-radius: 12px;
+  border: 1px solid #d3c5c5;
+  background: #302b2b;
+  transition: background 0.15s ease;
+  user-select: none;
+  color: #c0f2ae;
+}
+
+.numpad button.active { background: #b7f7b7; } /* flash green */
+
+#feedback {
+  font-size: 1.1rem;
+  min-height: 1.2rem;
+  margin-top: 0.25rem;
+  text-align: center;
+}
+
+.numpad button,
+#answerGrid button,
+#negToggle {
+  touch-action: manipulation;
+}
+
+/* Landing menu */
+.menu {
+  display: grid;
+  grid-template-columns: minmax(200px, 320px);
+  gap: 12px;
+  margin-top: 2rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.menu a {
+  display: block;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 12px;
+  background: #211d1d;
+  border: 1px solid #635c5c;
+  font-size: 1.1rem;
+  text-decoration: none;
+  color: #cce4ed;
+  transition: background 0.15s ease;
+}
+.menu a:hover { background: #5a80a3; }
+
+
+/* --- Choice grid shell (unit circle, etc.) --- */
+.choice-wrap {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: center;
+}
+
+#answerGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(90px, 1fr));
+  gap: 0.6rem;
+  margin: 0 4vw;
+  width: 100%;
+  max-width: 420px;
+}
+
+#answerGrid button {
+  font-size: 1.2rem;
+  border-radius: 10px;
+  border: 1px solid #1e2222;
+  background: #262424;
+  color: #e9e2e2;
+  padding: 0.6rem 0.4rem;
+  user-select: none;
+  transition: background 0.15s ease;
+}
+#answerGrid button.active { background: #b7f7b7; }
+
+#negToggle {
+  font-weight: 700;
+  font-size: 1.4rem;
+  background: #c0f2ae;
+  color: #e3e9e4;
+  border: 1px solid #444;
+}
+#negToggle.active { background: #4caf50; color: #fff; }
+
+#feedback, #stats {
+  text-align: center;
+}
