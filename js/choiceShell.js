@@ -21,13 +21,11 @@ export function setupChoiceGame({
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  const titleEl    = $("h1");
   const qEl        = $("#question");
   const grid       = $("#answerGrid");
   const feedbackEl = $("#feedback");
   const statsEl    = $("#stats");
 
-  titleEl.textContent = title;
 
   // ensure negToggle exists (first button is reserved for it)
   let negToggle = $("#negToggle");
