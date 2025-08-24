@@ -9,6 +9,20 @@ body {
   color:#c4f2f2
 }
 
+/* Vertical layout for factoring game */
+body.factoring #answerGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 500px; /* a bit wider since expressions are long */
+}
+
+body.factoring #answerGrid button {
+  width: 100%;
+  text-align: center;
+}
+
 h1 { margin: 0.5rem 0; }
 
 #question {
