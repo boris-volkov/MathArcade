@@ -36,7 +36,6 @@ const ANGLES = [
 const FNS = ["sin","cos","tan","sec","csc","cot"];
 
 export default {
-  title: "Trig Unit Circle",
   choices: CHOICES,
   enableNegToggle: true,
   // generate one random question

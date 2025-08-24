@@ -1,6 +1,5 @@
 // choiceShell.js – shared UI for multiple-choice / grid-answer games
 export function setupChoiceGame({
-  title = "Choice Game",
   // returns { questionLatex, answerLatex }
   generateQuestion,
   // array of LaTeX strings for canonical (positive) choices (e.g. "0", "\frac12", "\sqrt{3}", "undef")

@@ -7,26 +7,27 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>Loading…</h1>
-
   <div id="question"></div>
   <input id="answer" type="text" inputmode="numeric" readonly />
 
-  <div class="numpad">
-    <button data-digit="1">1</button>
-    <button data-digit="2">2</button>
-    <button data-digit="3">3</button>
-    <button data-digit="4">4</button>
-    <button data-digit="5">5</button>
-    <button data-digit="6">6</button>
-    <button data-digit="7">7</button>
-    <button data-digit="8">8</button>
-    <button data-digit="9">9</button>
-    <button data-action="clear">C</button>
-    <button data-digit="0">0</button>
-    <button data-action="back">⌫</button>
-    <button data-action="enter">⏎</button>
-  </div>
+  <!-- Numpad styled like calculator -->
+<div class="numpad">
+  <button data-digit="1">1</button>
+  <button data-digit="2">2</button>
+  <button data-digit="3">3</button>
+
+  <button data-digit="4">4</button>
+  <button data-digit="5">5</button>
+  <button data-digit="6">6</button>
+
+  <button data-digit="7">7</button>
+  <button data-digit="8">8</button>
+  <button data-digit="9">9</button>
+
+  <button data-action="clear" class="btn-clear">C</button>
+  <button data-digit="0">0</button>
+  <button data-action="enter" class="btn-enter">⏎</button>
+</div>
 
   <div id="feedback"></div>
 

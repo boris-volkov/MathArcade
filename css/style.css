@@ -57,6 +57,26 @@ h1 { margin: 0.5rem 0; }
 
 .numpad button.active { background: #b7f7b7; } /* flash green */
 
+/* Special styles for Clear and Enter */
+.numpad .btn-clear {
+  background: #5a1e1e;   /* deep red */
+  color: #fff;
+  font-weight: bold;
+}
+.numpad .btn-clear:hover {
+  background: #822;      /* lighter red */
+}
+
+.numpad .btn-enter {
+  background: #1e5a1e;   /* deep green */
+  color: #fff;
+  font-weight: bold;
+}
+.numpad .btn-enter:hover {
+  background: #2d7d2d;   /* lighter green */
+}
+
+
 #feedback {
   font-size: 1.1rem;
   min-height: 1.2rem;

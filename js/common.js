@@ -15,8 +15,6 @@ export function setupGame({ title, generateQuestion, nextDelayMs = 100, flashMs 
   const feedbackEl = $("#feedback");
   const buttons    = $$(".numpad button");
 
-  titleEl.textContent = title || "Math Game";
-
   let currentAnswer = null;
 
   function flash(btn) {
