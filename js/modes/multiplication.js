@@ -12,7 +12,7 @@ function generateQuestion() {
   const y = swap ? a : b;
 
   console.log(`[Mult] L${level} → big≤${maxGrowing(level)} :: ${x}×${y}`);
-  return { text: `${x} × ${y} = `, answer: x * y };
+  return { text: `${x} × ${y}`, answer: x * y };
 }
 
 generateQuestion.getLevel = () => level;

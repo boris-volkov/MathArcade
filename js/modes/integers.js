@@ -8,7 +8,7 @@ function generateQuestion() {
 
   const op = Math.random() < 0.5 ? "+" : "-";
 
-  const text = `${a} ${op} ${b} =`;
+  const text = `${a} ${op} ${b}`;
   const answer = (op === "+") ? a + b : a - b;
 
   console.log(`[Integers] ${text} ${answer}`);

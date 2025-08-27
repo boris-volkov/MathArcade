@@ -11,7 +11,7 @@ function generateQuestion() {
   const max = maxFromLevel(level);
   const a = Math.floor(Math.random() * max) + 10; // start at 10 to avoid trivial gcds
   const b = Math.floor(Math.random() * max) + 10;
-  return { text: `GCF(${a}, ${b}) = `, answer: math.gcd(a, b) };
+  return { text: `GCF(${a}, ${b})`, answer: math.gcd(a, b) };
 }
 
 generateQuestion.getLevel  = () => level;

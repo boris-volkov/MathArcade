@@ -11,7 +11,7 @@ function generateQuestion() {
   const max = maxFromLevel(level);
   const a = Math.floor(Math.random() * max) + 2; // avoid 1 (too trivial)
   const b = Math.floor(Math.random() * max) + 2;
-  return { text: `LCM(${a}, ${b}) = `, answer: math.lcm(a, b) };
+  return { text: `LCM(${a}, ${b})`, answer: math.lcm(a, b) };
 }
 
 generateQuestion.getLevel  = () => level;

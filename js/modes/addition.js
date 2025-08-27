@@ -7,7 +7,7 @@ function generateQuestion() {
   const a = Math.floor(Math.random() * max) + 1;
   const b = Math.floor(Math.random() * max) + 1;
   console.log(`[Add] L${level} → max=${max} :: ${a}+${b}`);
-  return { text: `${a} + ${b} = `, answer: a + b };
+  return { text: `${a} + ${b}`, answer: a + b };
 }
 generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp   = () => { level++; console.log("[Level] →", level); };
