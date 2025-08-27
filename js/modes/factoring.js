@@ -1,114 +1,119 @@
-let level = 1;
-
 // js/modes/factoring.js
-// Utilities
-function randInt(lo, hi) {
-  return lo + Math.floor(Math.random() * (hi - lo + 1));
+// Generates a primitive quadratic Ax^2 + Bx + C (gcd(A,B,C)=1) that factors
+// uniquely into two primitive binomials (ux+v)(wx+z). No scalar factor.
+
+let level = 1; // kept for shell compatibility (not used for difficulty here)
+
+// ---------- helpers ----------
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
+function coprime(a, b) { return gcd(a, b) === 1; }
+function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function nz(min, max) { let v; do { v = ri(min, max); } while (v === 0); return v; }
+
+// Primitive binomial (p x + q) where p≠0 and gcd(p,q)=1
+function primitiveBinomial(pMin, pMax, qMin, qMax) {
+  let p, q;
+  do { p = nz(pMin, pMax); q = ri(qMin, qMax); } while (!coprime(p, q));
+  return [p, q];
 }
-function nonzero(lo, hi) {
-  let v = 0;
-  while (v === 0) v = randInt(lo, hi);
-  return v;
+
+// Canonicalize (ux+v)(wx+z):
+//  - Make leading coeffs positive (move -1 into constant).
+//  - Sort the pair lexicographically so order doesn't create duplicates.
+function canonicalize(u, v, w, z) {
+  if (u < 0) { u = -u; v = -v; }
+  if (w < 0) { w = -w; z = -z; }
+  const A = { u, v }, B = { u: w, v: z };
+  const key = ({ u, v }) => `${u},${v}`;
+  const first = key(A) <= key(B) ? A : B;
+  const second = first === A ? B : A;
+  return [first.u, first.v, second.u, second.v];
 }
+
+function expand(u, v, w, z) {
+  return { A: u * w, B: u * z + v * w, C: v * z };
+}
+
+// KaTeX-friendly formatting (no trailing equals)
+function sign(n) { return n < 0 ? " - " : " + "; }
 function formatPoly(A, B, C) {
-  // Build a KaTeX string for Ax^2 + Bx + C with nice sign handling, hiding 1-coeffs
   const ax2 = (A === 1) ? "x^{2}" : (A === -1 ? "-x^{2}" : `${A}x^{2}`);
-  const bx  = (B === 0) ? "" : (B === 1 ? " + x" : (B === -1 ? " - x" : (B > 0 ? ` + ${B}x` : ` - ${-B}x`)));
-  const c   = (C === 0) ? "" : (C > 0 ? ` + ${C}` : ` - ${-C}`);
+  const bx  = (B === 0) ? "" : (B === 1 ? " + x" : (B === -1 ? " - x" : `${sign(B)}${Math.abs(B)}x`));
+  const c   = (C === 0) ? "" : `${sign(C)}${Math.abs(C)}`;
   return `${ax2}${bx}${c}`;
 }
-function formatBinomial(a, b) {
-  // (ax + b) with a=±1 displayed as x/ -x; sign of b handled
-  const ax = (a === 1) ? "x" : (a === -1 ? "-x" : `${a}x`);
-  const sb = (b === 0) ? "" : (b > 0 ? ` + ${b}` : ` - ${-b}`);
-  return `(${ax}${sb})`;
-}
-function polyFromFactors(a, b, c, d) {
-  // (ax + b)(cx + d) => A=ac, B=ad+bc, C=bd
-  const A = a * c;
-  const B = a * d + b * c;
-  const C = b * d;
-  return { A, B, C };
-}
-function distinctTuple(t, list) {
-  return !list.some(u => u[0] === t[0] && u[1] === t[1] && u[2] === t[2] && u[3] === t[3]);
+function binoLatex(u, v) {
+  const ux = (u === 1) ? "x" : (u === -1 ? "-x" : `${u}x`);
+  const sv = (v === 0) ? "" : (v > 0 ? ` + ${v}` : ` - ${-v}`);
+  return `(${ux}${sv})`;
 }
 
+// ---------- generator ----------
 function generateQuestion() {
-    // Make a valid factorization from small integers
-    // Choose a,c small nonzero; b,d in a moderate range
-    let a = nonzero(1, 3);
-    let c = nonzero(1, 3);
-    let b = nonzero(-9, 9);
-    let d = nonzero(-9, 9);
+  // Tune ranges as desired: keep u,w small; v,z moderate for readable B,C
+  // We will loop until we find a primitive trinomial with reasonable bounds.
+  let u, v, w, z, A, B, C;
 
-    // Keep coefficients in a reasonable range
-    let { A, B, C } = polyFromFactors(a, b, c, d);
-    let guard = 0;
-    while ((Math.abs(A) > 12 || Math.abs(B) > 60 || Math.abs(C) > 60) && guard < 200) {
-      a = nonzero(1, 3);
-      c = nonzero(1, 3);
-      b = nonzero(-9, 9);
-      d = nonzero(-9, 9);
-      ({ A, B, C } = polyFromFactors(a, b, c, d));
-      guard++;
-    }
+  while (true) {
+    // two primitive binomials
+    [u, v] = primitiveBinomial(1, 6, -9, 9);
+    [w, z] = primitiveBinomial(1, 6, -9, 9);
 
-    const questionLatex = `${formatPoly(A, B, C)}`;
+    ({ A, B, C } = expand(u, v, w, z));
 
-    // Correct tuple
-    const correctTuple = [a, b, c, d];
+    // enforce primitive trinomial
+    if (gcd(gcd(A, B), C) !== 1) continue;
 
-    // Build distractors by mutating (a,b,c,d) in ways that keep A and/or C plausible
-    const choices = [correctTuple];
-    const tryAdd = (t) => {
-      if (distinctTuple(t, choices)) choices.push(t);
-    };
+    // keep numbers within bounds to avoid ugly choices
+    if (Math.abs(A) > 12 || Math.abs(B) > 60 || Math.abs(C) > 60) continue;
 
-    // Common wrong patterns
-    tryAdd([a, d, c, b]);                // swap inner constants
-    tryAdd([a, -b, c, -d]);              // flip both constants' signs
-    tryAdd([c, b, a, d]);                // swap a<->c
-    tryAdd([a, b + (b > 0 ? -1 : 1), c, d]); // nudge b
-    tryAdd([a, b, c, d + (d > 0 ? -1 : 1)]); // nudge d
-    tryAdd([a, b, -c, -d]);              // pull a leading minus into the second factor
-
-    // If fewer than 6, pad with random tweaks that keep |A|,|B|,|C| sane
-    while (choices.length < 6) {
-      const ta = a * (Math.random() < 0.5 ? 1 : -1);
-      const tc = c * (Math.random() < 0.5 ? 1 : -1);
-      const tb = b + randInt(-2, 2);
-      const td = d + randInt(-2, 2);
-      const t  = [ta || 1, tb || 1, tc || 1, td || 1];
-      const { A: A2, B: B2, C: C2 } = polyFromFactors(...t);
-      if (Math.abs(A2) <= 12 && Math.abs(B2) <= 60 && Math.abs(C2) <= 60 && distinctTuple(t, choices)) {
-        choices.push(t);
-      }
-    }
-
-    // Shuffle and find correct index
-    for (let i = choices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [choices[i], choices[j]] = [choices[j], choices[i]];
-    }
-    const correctIndex = choices.findIndex(
-      t => t[0] === correctTuple[0] && t[1] === correctTuple[1] && t[2] === correctTuple[2] && t[3] === correctTuple[3]
-    );
-
-    // Convert tuples to KaTeX strings
-    const choicesLatex = choices.map(([aa, bb, cc, dd]) => {
-      const left  = formatBinomial(aa, bb);
-      const right = formatBinomial(cc, dd);
-      return `${left}${right}`;
-    });
-
-    return { questionLatex, choicesLatex, correctIndex };
+    break;
   }
 
-// attach level helpers
+  // canonicalize factors so the correct answer is unique
+  [u, v, w, z] = canonicalize(u, v, w, z);
+
+  // build question
+  const questionLatex = formatPoly(A, B, C);
+
+  // correct answer (no scalar)
+  const correctLatex = `${binoLatex(u, v)}${binoLatex(w, z)}`;
+
+  // build choices with dedupe
+  const seen = new Set([correctLatex]);
+  const choices = [correctLatex];
+
+  function addChoice(U, V, W, Z) {
+    [U, V, W, Z] = canonicalize(U, V, W, Z);
+    const latex = `${binoLatex(U, V)}${binoLatex(W, Z)}`;
+    if (!seen.has(latex)) { seen.add(latex); choices.push(latex); }
+  }
+
+  // structured plausible distractors (always canonicalize)
+  addChoice(u, v + 1, w, z - 1);
+  addChoice(u, v - 1, w, z + 1);
+  addChoice(u, -v,    w, -z);      // flip constants
+  addChoice(w, z,     u, v);       // swap factor order
+
+  // pad to at least 6 with gentle random tweaks that keep readability
+  while (choices.length < 6) {
+    const dv = ri(-1, 1), dz = ri(-1, 1);
+    addChoice(u, v + dv, w, z + dz);
+  }
+
+  // shuffle and find correct index
+  for (let i = choices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [choices[i], choices[j]] = [choices[j], choices[i]];
+  }
+  const correctIndex = choices.indexOf(correctLatex);
+
+  return { questionLatex, choicesLatex: choices, correctIndex };
+}
+
+// ---------- level helpers (for shell compatibility) ----------
 generateQuestion.getLevel  = () => level;
 generateQuestion.bumpUp    = () => { level++; console.log("[Factoring Level] →", level); };
 generateQuestion.bumpDown  = () => { level = Math.max(1, level - 1); console.log("[Factoring Level] →", level); };
 
 export default { generateQuestion };
-
