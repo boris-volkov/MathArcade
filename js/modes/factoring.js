@@ -1,3 +1,5 @@
+let level = 1;
+
 // js/modes/factoring.js
 // Utilities
 function randInt(lo, hi) {
@@ -32,9 +34,7 @@ function distinctTuple(t, list) {
   return !list.some(u => u[0] === t[0] && u[1] === t[1] && u[2] === t[2] && u[3] === t[3]);
 }
 
-export default {
-  // generateQuestion returns { questionLatex, choicesLatex[], correctIndex }
-  generateQuestion() {
+function generateQuestion() {
     // Make a valid factorization from small integers
     // Choose a,c small nonzero; b,d in a moderate range
     let a = nonzero(1, 3);
@@ -104,4 +104,11 @@ export default {
 
     return { questionLatex, choicesLatex, correctIndex };
   }
-};
+
+// attach level helpers
+generateQuestion.getLevel  = () => level;
+generateQuestion.bumpUp    = () => { level++; console.log("[Factoring Level] →", level); };
+generateQuestion.bumpDown  = () => { level = Math.max(1, level - 1); console.log("[Factoring Level] →", level); };
+
+export default { generateQuestion };
+

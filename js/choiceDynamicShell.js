@@ -39,6 +39,9 @@ export function setupDynamicChoiceGame({
 
   function buildForQuestion() {
     const { questionLatex, choicesLatex, correctIndex } = generateQuestion();
+    if (typeof generateQuestion.getLevel === "function") {
+      console.log("[Level]", generateQuestion.getLevel());
+    }
     currentCorrectIndex = correctIndex;
 
     // render question

@@ -21,10 +21,16 @@ export function setupChoiceGame({
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  const qEl        = $("#question");
-  const grid       = $("#answerGrid");
+  const qEl = $("#question");
+  const grid = $("#answerGrid");
   const feedbackEl = $("#feedback");
-  const statsEl    = $("#stats");
+  const statsEl = $("#stats");
+
+  // NEW: anti-spam bump cooldown & guard
+  let lastRateBumpAt = 0;     // ms timestamp
+  const RATE_BUMP_COOLDOWN = 20000; // 20s between bumps
+  const RATE_THRESHOLD = 3;   // 3 correct per minute
+  const MIN_TOTAL_FOR_RATE = 5; // don’t bump until we have some data
 
 
   // ensure negToggle exists (first button is reserved for it)
@@ -85,15 +91,29 @@ export function setupChoiceGame({
   } else {
     negToggle.style.display = "none";
   }
-
   function updateStats() {
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
     statsEl.innerHTML = `Correct: ${correct} / Total: ${total}<br>Rate: ${rate} per min`;
+
+    // Only switch once we've answered enough questions
+    if (typeof generateQuestion.setUseAllFns === "function" && total >= MIN_TOTAL_FOR_RATE) {
+      if (Number(rate) >= 3) {
+        generateQuestion.setUseAllFns(true);   // unlock sec/csc/cot
+      } else {
+        generateQuestion.setUseAllFns(false);  // stick to sin/cos/tan
+      }
+    }
   }
+
+
+
 
   function setQuestion() {
     const { questionLatex, answerLatex } = generateQuestion();
+    if (typeof generateQuestion.getLevel === "function") {
+      console.log("[Level]", generateQuestion.getLevel());
+    }
     currentAnswerLatex = answerLatex;
     qEl.innerHTML = "";
     try { katex.render(questionLatex, qEl, { throwOnError: false }); }

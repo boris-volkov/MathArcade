@@ -1,36 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Math Game</title>
   <link rel="stylesheet" href="css/style.css" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <div id="question"></div>
+<div class="answer-group">
   <input id="answer" type="text" inputmode="numeric" readonly />
+  <button id="clearBtn" class="btn-clear-inline" aria-label="Clear answer">C</button>
+</div>
 
   <!-- Numpad styled like calculator -->
-<div class="numpad">
-  <button data-digit="1">1</button>
-  <button data-digit="2">2</button>
-  <button data-digit="3">3</button>
+  <div class="numpad">
+    <button data-digit="1">1</button>
+    <button data-digit="2">2</button>
+    <button data-digit="3">3</button>
 
-  <button data-digit="4">4</button>
-  <button data-digit="5">5</button>
-  <button data-digit="6">6</button>
+    <button data-digit="4">4</button>
+    <button data-digit="5">5</button>
+    <button data-digit="6">6</button>
 
-  <button data-digit="7">7</button>
-  <button data-digit="8">8</button>
-  <button data-digit="9">9</button>
+    <button data-digit="7">7</button>
+    <button data-digit="8">8</button>
+    <button data-digit="9">9</button>
 
-  <button data-action="clear" class="btn-clear">C</button>
-  <button data-digit="0">0</button>
-  <button data-action="enter" class="btn-enter">⏎</button>
-</div>
+    <button data-action="neg" class="btn-neg">±</button> <!-- NEW -->
+    <button data-digit="0">0</button>
+    <button data-action="enter" class="btn-enter">›</button>
+  </div>
 
   <div id="feedback"></div>
 
   <script type="module" src="js/main.js"></script>
 </body>
+
 </html>

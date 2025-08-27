@@ -1,6 +1,7 @@
 /* Layout / typography */
 body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-family: 'Press Start 2P', monospace;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -30,6 +31,72 @@ h1 { margin: 0.5rem 0; }
   font-size: clamp(1.6rem, 4vw, 2.2rem);
   margin: 1rem 0;
   text-align: center;
+}
+
+/* Apply retro font only to game elements */
+#question,
+#answer,
+#answerGrid button,
+.numpad button {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.9rem;   /* smaller so it fits */
+  line-height: 1.2;    /* tighter line spacing */
+}
+
+#question {
+  font-size: 1.5rem;  /* override for question */
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+
+/* Seamless input + clear button group */
+.answer-group {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid #aac3c6;
+  border-radius: 10px;
+  background: #312c2c;         /* same as your input bg */
+  overflow: hidden;             /* clip inner corners */
+  margin-bottom: 1rem;          /* replaces old #answer margin */
+}
+
+/* Let the group own the border/radius; input becomes flat inside */
+.answer-group #answer {
+  border: 0;
+  border-radius: 0;
+  margin: 0;                    /* kill existing bottom margin */
+  background: transparent;      /* inherit group bg */
+  color: #b7f7b7;
+  font-size: 1.5rem;            /* keep your current size */
+  text-align: center;
+  width: 8ch;
+  padding: 0.35rem 0.75rem;     /* vertical height control */
+  line-height: 1.2;
+}
+
+/* Inline clear matches height and rounds on the right */
+.answer-group .btn-clear-inline {
+  border: 0;
+  border-left: 1px solid #8aa1a4;   /* divider between input and button */
+  background: #5a1e1e;
+  color: #fff;
+  font-weight: 700;
+  padding: 0 0.8rem;                /* no vertical padding needed; group controls height */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Hover/focus states */
+.answer-group .btn-clear-inline:hover { background: #822; }
+.answer-group:focus-within { box-shadow: 0 0 0 2px rgba(183,247,183,0.15) inset; }
+
+/* Keep your existing "wrong" feedback effect working */
+#answer.wrong {
+  background: #de6b6b;   /* will fill the left side of the pill */
+  border-color: transparent;
 }
 
 #answer {
@@ -64,7 +131,7 @@ h1 { margin: 0.5rem 0; }
   padding: 0.9rem;
   border-radius: 12px;
   border: 1px solid #d3c5c5;
-  background: #302b2b;
+  background: #363f50;
   transition: background 0.15s ease;
   user-select: none;
   color: #c0f2ae;
@@ -91,6 +158,14 @@ h1 { margin: 0.5rem 0; }
   background: #2d7d2d;   /* lighter green */
 }
 
+.numpad .btn-neg {
+  background: #333366;  /* bluish */
+  color: #fff;
+  font-weight: bold;
+}
+.numpad .btn-neg:hover {
+  background: #5555aa;
+}
 
 #feedback {
   font-size: 1.1rem;
@@ -116,8 +191,10 @@ h1 { margin: 0.5rem 0; }
 }
 
 .menu a {
-  display: block;
+  display: flex;
+  flex-direction: column;
   text-align: center;
+  justify-content: center;
   padding: 1rem;
   border-radius: 12px;
   background: #211d1d;
@@ -183,6 +260,7 @@ h1 { margin: 0.5rem 0; }
   box-shadow: 0 6px 20px rgba(0,0,0,0.25);
 }
 
+
 .section h2 {
   margin: 0 0 0.75rem;
   font-size: 1.35rem;
@@ -206,13 +284,14 @@ h1 { margin: 0.5rem 0; }
 
 /* make menus lay out nicely inside sections */
 .section .menu {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-  margin: 0.5rem 0 0;   /* tighten under the h2 */
+  display: flex;
+  flex-direction: column; /* stack children vertically */
+  gap: 12px;              /* keep spacing */
 }
 
 /* a touch more size/weight for links inside cards */
 .section .menu a {
   font-size: 1.05rem;
   padding: 0.9rem 1rem;
+  border-color: #8eadbb;
 }

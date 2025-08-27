@@ -33,20 +33,31 @@ const ANGLES = [
   { rad:"\\frac{11\\pi}{6}", sin:"-\\frac{1}{2}", cos:"\\frac{\\sqrt{3}}{2}", tan:"-\\frac{\\sqrt{3}}{3}", sec:"\\frac{2\\sqrt{3}}{3}", csc:"-2", cot:"-\\sqrt{3}" },
 ];
 
-const FNS = ["sin","cos","tan","sec","csc","cot"];
+const FNS_ALL   = ["sin","cos","tan","sec","csc","cot"];
+const FNS_BASIC = FNS_ALL.slice(0, 3);
+
+let useAllFns = false;
+
+function generateQuestion() {
+  const angle = ANGLES[Math.floor(Math.random() * ANGLES.length)];
+  const fnSet = useAllFns ? FNS_ALL : FNS_BASIC;
+  const fn = fnSet[Math.floor(Math.random() * fnSet.length)];
+  return {
+    questionLatex: `${fn}\\left(${angle.rad}\\right)`,
+    answerLatex: angle[fn],
+  };
+}
+
+// API for shell to flip binary mode
+generateQuestion.setUseAllFns = (flag) => {
+  useAllFns = !!flag;
+  console.log(`[Unit Circle] useAllFns=${useAllFns}`);
+};
 
 export default {
   choices: CHOICES,
   enableNegToggle: true,
-  // generate one random question
-  generateQuestion() {
-    const angle = ANGLES[Math.floor(Math.random() * ANGLES.length)];
-    const fn = FNS[Math.floor(Math.random() * FNS.length)];
-    return {
-      questionLatex: `${fn}\\left(${angle.rad}\\right)`,
-      answerLatex: angle[fn],
-    };
-  },
-  // strict equality of LaTeX strings is fine here
+  generateQuestion,
   isCorrect(user, correct) { return user === correct; },
 };
+

@@ -8,6 +8,7 @@ const MODE_PATHS = {
   addition: "./modes/addition.js",
   lcm: "./modes/lcm.js",
   gcf: "./modes/gcf.js",
+  integers: "./modes/integers.js", // NEW
 };
 
 async function boot() {
