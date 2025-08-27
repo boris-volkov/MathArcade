@@ -6,8 +6,8 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 1rem;
-  background: #2b2e30;
-  color:#c4f2f2
+  background: #15171c;
+  color: #c4f2f2
 }
 
 /* Vertical layout for factoring game */
@@ -16,7 +16,8 @@ body.factoring #answerGrid {
   flex-direction: column;
   gap: 0.6rem;
   width: 100%;
-  max-width: 500px; /* a bit wider since expressions are long */
+  max-width: 500px;
+  /* a bit wider since expressions are long */
 }
 
 body.factoring #answerGrid button {
@@ -24,8 +25,32 @@ body.factoring #answerGrid button {
   text-align: center;
 }
 
-h1 { margin: 0.5rem 0; }
+h1 {
+  margin: 0.5rem 0;
+  font-size: 3rem;
+}
 
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* push title left, logo right */
+  width: 100%;
+  max-width: 920px;
+  /* same as your section width for balance */
+  margin-bottom: 0;
+}
+
+.site-header .logo {
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 3rem;
+}
 
 #question {
   font-size: clamp(1.6rem, 4vw, 2.2rem);
@@ -40,12 +65,15 @@ h1 { margin: 0.5rem 0; }
 .btn-clear-inline,
 .numpad button {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;   /* smaller so it fits */
-  line-height: 1.2;    /* tighter line spacing */
+  font-size: 0.9rem;
+  /* smaller so it fits */
+  line-height: 1.2;
+  /* tighter line spacing */
 }
 
 #question {
-  font-size: 1.5rem;  /* override for question */
+  font-size: 1.5rem;
+  /* override for question */
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -57,33 +85,42 @@ h1 { margin: 0.5rem 0; }
   align-items: stretch;
   border: 1px solid #aac3c6;
   border-radius: 10px;
-  background: #312c2c;         /* same as your input bg */
-  overflow: hidden;             /* clip inner corners */
-  margin-bottom: 1rem;          /* replaces old #answer margin */
+  background: #312c2c;
+  /* same as your input bg */
+  overflow: hidden;
+  /* clip inner corners */
+  margin-bottom: 1rem;
+  /* replaces old #answer margin */
 }
 
 /* Let the group own the border/radius; input becomes flat inside */
 .answer-group #answer {
   border: 0;
   border-radius: 0;
-  margin: 0;                    /* kill existing bottom margin */
-  background: transparent;      /* inherit group bg */
+  margin: 0;
+  /* kill existing bottom margin */
+  background: transparent;
+  /* inherit group bg */
   color: #b7f7b7;
-  font-size: 1.5rem;            /* keep your current size */
+  font-size: 1.5rem;
+  /* keep your current size */
   text-align: center;
   width: 8ch;
-  padding: 0.35rem 0.75rem;     /* vertical height control */
+  padding: 0.35rem 0.75rem;
+  /* vertical height control */
   line-height: 1.2;
 }
 
 /* Inline clear matches height and rounds on the right */
 .answer-group .btn-clear-inline {
   border: 0;
-  border-left: 1px solid #8aa1a4;   /* divider between input and button */
+  border-left: 1px solid #8aa1a4;
+  /* divider between input and button */
   background: #5a1e1e;
   color: #fff;
   font-weight: 700;
-  padding: 0 0.8rem;                /* no vertical padding needed; group controls height */
+  padding: 0 0.8rem;
+  /* no vertical padding needed; group controls height */
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -91,12 +128,18 @@ h1 { margin: 0.5rem 0; }
 }
 
 /* Hover/focus states */
-.answer-group .btn-clear-inline:hover { background: #822; }
-.answer-group:focus-within { box-shadow: 0 0 0 2px rgba(183,247,183,0.15) inset; }
+.answer-group .btn-clear-inline:hover {
+  background: #822;
+}
+
+.answer-group:focus-within {
+  box-shadow: 0 0 0 2px rgba(183, 247, 183, 0.15) inset;
+}
 
 /* Keep your existing "wrong" feedback effect working */
 #answer.wrong {
-  background: #de6b6b;   /* will fill the left side of the pill */
+  background: #de6b6b;
+  /* will fill the left side of the pill */
   border-color: transparent;
 }
 
@@ -138,32 +181,44 @@ h1 { margin: 0.5rem 0; }
   color: #c0f2ae;
 }
 
-.numpad button.active { background: #b7f7b7; } /* flash green */
+.numpad button.active {
+  background: #b7f7b7;
+}
+
+/* flash green */
 
 /* Special styles for Clear and Enter */
 .numpad .btn-clear {
-  background: #5a1e1e;   /* deep red */
+  background: #5a1e1e;
+  /* deep red */
   color: #fff;
   font-weight: bold;
 }
+
 .numpad .btn-clear:hover {
-  background: #822;      /* lighter red */
+  background: #822;
+  /* lighter red */
 }
 
 .numpad .btn-enter {
-  background: #1e5a1e;   /* deep green */
+  background: #1e5a1e;
+  /* deep green */
   color: #fff;
   font-weight: bold;
 }
+
 .numpad .btn-enter:hover {
-  background: #2d7d2d;   /* lighter green */
+  background: #2d7d2d;
+  /* lighter green */
 }
 
 .numpad .btn-neg {
-  background: #333366;  /* bluish */
+  background: #333366;
+  /* bluish */
   color: #fff;
   font-weight: bold;
 }
+
 .numpad .btn-neg:hover {
   background: #5555aa;
 }
@@ -205,7 +260,10 @@ h1 { margin: 0.5rem 0; }
   color: #cce4ed;
   transition: background 0.15s ease;
 }
-.menu a:hover { background: #5a80a3; }
+
+.menu a:hover {
+  background: #5a80a3;
+}
 
 
 /* --- Choice grid shell (unit circle, etc.) --- */
@@ -234,7 +292,10 @@ h1 { margin: 0.5rem 0; }
   user-select: none;
   transition: background 0.15s ease;
 }
-#answerGrid button.active { background: #b7f7b7; }
+
+#answerGrid button.active {
+  background: #b7f7b7;
+}
 
 #negToggle {
   font-weight: 700;
@@ -243,9 +304,14 @@ h1 { margin: 0.5rem 0; }
   color: #e3e9e4;
   border: 1px solid #444;
 }
-#negToggle.active { background: #4caf50; color: #fff; }
 
-#feedback, #stats {
+#negToggle.active {
+  background: #4caf50;
+  color: #fff;
+}
+
+#feedback,
+#stats {
   text-align: center;
 }
 
@@ -254,11 +320,11 @@ h1 { margin: 0.5rem 0; }
 .section {
   width: 100%;
   max-width: 920px;
-  margin: 1.5rem 0;
+  margin: 0 0 1.5rem;
   padding: 1.25rem 1rem;
   border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -274,20 +340,26 @@ h1 { margin: 0.5rem 0; }
   background: #232729;
   border-color: #374246;
 }
+
 .section--algebra {
-  background: #242327;  /* slight magenta tint */
+  background: #242327;
+  /* slight magenta tint */
   border-color: #433b51;
 }
+
 .section--trig {
-  background: #21282b;  /* slight teal/blue tint */
+  background: #21282b;
+  /* slight teal/blue tint */
   border-color: #38525a;
 }
 
 /* make menus lay out nicely inside sections */
 .section .menu {
   display: flex;
-  flex-direction: column; /* stack children vertically */
-  gap: 12px;              /* keep spacing */
+  flex-direction: column;
+  /* stack children vertically */
+  gap: 12px;
+  /* keep spacing */
 }
 
 /* a touch more size/weight for links inside cards */
