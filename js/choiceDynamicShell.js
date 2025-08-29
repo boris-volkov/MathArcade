@@ -19,6 +19,7 @@ export function setupDynamicChoiceGame({
 
   let correct = 0, total = 0, start = performance.now();
   let currentCorrectIndex = -1;
+  let lastQuestionKey = null;
 
   function flash(btn) {
     btn.classList.add("active");
@@ -38,7 +39,17 @@ export function setupDynamicChoiceGame({
   }
 
   function buildForQuestion() {
-    const { questionLatex, choicesLatex, correctIndex } = generateQuestion();
+    // Avoid repeating the same question back-to-back
+    let q = generateQuestion();
+    let key = q?.questionLatex ?? "";
+    let guard = 0;
+    while (lastQuestionKey !== null && key === lastQuestionKey && guard < 5) {
+      q = generateQuestion();
+      key = q?.questionLatex ?? "";
+      guard++;
+    }
+    lastQuestionKey = key;
+    const { questionLatex, choicesLatex, correctIndex } = q;
     if (typeof generateQuestion.getLevel === "function") {
       console.log("[Level]", generateQuestion.getLevel());
     }

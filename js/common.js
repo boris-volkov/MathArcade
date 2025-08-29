@@ -23,6 +23,19 @@ if (clearBtn) {
 
 
   let currentAnswer = null;
+  let lastQuestionKey = null;
+
+  function getQuestionKey(q) {
+    if (q && typeof q.key === "string" && q.key.length) return q.key;
+    if (q && typeof q.latex === "string" && q.latex.length) return `L:${q.latex}`;
+    if (q && typeof q.text === "string" && q.text.length) return `T:${q.text}`;
+    // Fallback: stringify stable fields if present
+    try {
+      return JSON.stringify({ t: q?.text ?? null, l: q?.latex ?? null });
+    } catch {
+      return String(Math.random()); // ensure progress even if unkeyable
+    }
+  }
 
   function flash(btn) {
     btn.classList.add("active");
@@ -30,7 +43,16 @@ if (clearBtn) {
   }
 
   function newQuestion() {
-    const q = generateQuestion();
+    // Avoid showing the exact same question twice in a row
+    let q = generateQuestion();
+    let key = getQuestionKey(q);
+    let guard = 0;
+    while (lastQuestionKey !== null && key === lastQuestionKey && guard < 5) {
+      q = generateQuestion();
+      key = getQuestionKey(q);
+      guard++;
+    }
+    lastQuestionKey = key;
     const { text, latex, answer } = q;
     if (typeof generateQuestion.getLevel === "function") {
       console.log("[Level]", generateQuestion.getLevel());

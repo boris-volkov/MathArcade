@@ -1,6 +1,6 @@
 let level = 1;
 function maxFromLevel(lv) {
-  return [10, 10, 15, 20, 50, 100, 200, 500][lv - 1] ?? 1000;
+  return lv*5;
 }
 function generateQuestion() {
   const max = maxFromLevel(level);

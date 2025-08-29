@@ -81,6 +81,7 @@ export function setupChoiceGame({
   let negateActive = false;
   let correct = 0, total = 0, start = performance.now();
   let currentAnswerLatex = null;
+  let lastQuestionKey = null;
 
   if (enableNegToggle) {
     negToggle.style.display = "";
@@ -110,7 +111,17 @@ export function setupChoiceGame({
 
 
   function setQuestion() {
-    const { questionLatex, answerLatex } = generateQuestion();
+    // Avoid repeating the same question back-to-back
+    let q = generateQuestion();
+    let key = q?.questionLatex ?? "";
+    let guard = 0;
+    while (lastQuestionKey !== null && key === lastQuestionKey && guard < 5) {
+      q = generateQuestion();
+      key = q?.questionLatex ?? "";
+      guard++;
+    }
+    lastQuestionKey = key;
+    const { questionLatex, answerLatex } = q;
     if (typeof generateQuestion.getLevel === "function") {
       console.log("[Level]", generateQuestion.getLevel());
     }
