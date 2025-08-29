@@ -30,12 +30,20 @@ if (clearBtn) {
   }
 
   function newQuestion() {
-    const { text, answer } = generateQuestion();
+    const q = generateQuestion();
+    const { text, latex, answer } = q;
     if (typeof generateQuestion.getLevel === "function") {
       console.log("[Level]", generateQuestion.getLevel());
     }
     currentAnswer = answer;
-    questionEl.textContent = text;
+    // Prefer LaTeX rendering if provided and KaTeX is available
+    if (latex && window.katex) {
+      questionEl.innerHTML = "";
+      try { katex.render(latex, questionEl, { throwOnError: false }); }
+      catch { questionEl.textContent = text ?? String(latex); }
+    } else {
+      questionEl.textContent = text ?? (latex ? String(latex) : "");
+    }
     answerEl.value = "";
     feedbackEl.textContent = "";
   }
