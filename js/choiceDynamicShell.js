@@ -35,7 +35,7 @@ export function setupDynamicChoiceGame({
   function updateStats() {
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    statsEl.innerHTML = `Correct: ${correct}<br>Rate: ${rate} per min`;
+    statsEl.innerHTML = `Correct: ${correct}/${total}<br>Rate: ${rate} per min`;
   }
 
   function buildForQuestion() {

@@ -10,12 +10,14 @@ function simplifyFrac(n, d) {
   return { n: n/gg, d: d/gg };
 }
 
-function angleLatexFromM(m) {
-  if (m === 0) return "0";
-  const f = simplifyFrac(m, 12);
+function angleLatexFromNumerator(n) {
+  if (n === 0) return "0";
+  const sign = n < 0 ? "-" : "";
+  const a = Math.abs(n);
+  const f = simplifyFrac(a, 12);
   const num = f.n === 1 ? "\\pi" : `${f.n}\\pi`;
-  if (f.d === 1) return `${num}`;
-  return `\\frac{${num}}{${f.d}}`;
+  if (f.d === 1) return `${sign}${num}`;
+  return `${sign}\\frac{${num}}{${f.d}}`;
 }
 
 function pickM() {
@@ -28,7 +30,20 @@ function pickM() {
 
 function generateQuestion() {
   const m = pickM();
-  const latex = angleLatexFromM(m);
+  let displayNumerator = m;
+  if (level > 20) {
+    const roll = Math.random();
+    if (roll < 0.5 && m !== 0) {
+      // Show as a negative equivalent: -( (24 - m) mod 24 )
+      const mp = (24 - m) % 24;
+      displayNumerator = -mp;
+    } else if (roll < 0.85) {
+      // Show as > 2π by adding full turns
+      const t = 1 + Math.floor(Math.random() * Math.min(2, Math.max(1, Math.floor((level - 20) / 5))));
+      displayNumerator = m + 24 * t;
+    }
+  }
+  const latex = angleLatexFromNumerator(displayNumerator);
   return { questionLatex: latex, answerIndex: m };
 }
 
