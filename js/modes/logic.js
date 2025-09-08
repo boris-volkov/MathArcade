@@ -51,31 +51,39 @@ function evalTree(node) {
 
 function toAscii(node, parentOp = null) {
   if (node.kind === 'lit') return String(node.v);
-  if (node.kind === 'not') return `!(${toAscii(node.node)})`;
+  if (node.kind === 'not') {
+    const inner = toAscii(node.node, null);
+    // Only parenthesize NOT operand if it's a binary op
+    return node.node.kind === 'op' ? `!(${inner})` : `!${inner}`;
+  }
   const prec = { '||': 1, '&&': 2 };
   const L = toAscii(node.left, node.sym);
   const R = toAscii(node.right, node.sym);
-  const lp = (node.left.kind === 'op' && prec[node.left.sym] < prec[node.sym]) ? `(${L})` : L;
-  const rp = (node.right.kind === 'op' && prec[node.right.sym] <= prec[node.sym]) ? `(${R})` : R;
+  const lNeeds = node.left.kind === 'op' && prec[node.left.sym] < prec[node.sym];
+  // For associative ops, do not parenthesize equal precedence
+  const rNeeds = node.right.kind === 'op' && prec[node.right.sym] < prec[node.sym];
+  const lp = lNeeds ? `(${L})` : L;
+  const rp = rNeeds ? `(${R})` : R;
   const body = `${lp} ${node.sym} ${rp}`;
-  if (!parentOp) return body;
-  return prec[parentOp] > prec[node.sym] ? `(${body})` : body;
+  return body;
 }
 
 function toLatex(node, parentOp = null) {
   if (node.kind === 'lit') return String(node.v);
-  if (node.kind === 'not') return `\\lnot\\left(${toLatex(node.node)}\\right)`;
+  if (node.kind === 'not') {
+    const inner = toLatex(node.node, null);
+    return node.node.kind === 'op' ? `\\lnot\\left(${inner}\\right)` : `\\lnot ${inner}`;
+  }
   const prec = { '||': 1, '&&': 2 };
   const symLx = node.sym === '&&' ? '\\land' : '\\lor';
   const Ls = toLatex(node.left, node.sym);
   const Rs = toLatex(node.right, node.sym);
   const lNeeds = node.left.kind === 'op' && prec[node.left.sym] < prec[node.sym];
-  const rNeeds = node.right.kind === 'op' && prec[node.right.sym] <= prec[node.sym];
+  const rNeeds = node.right.kind === 'op' && prec[node.right.sym] < prec[node.sym];
   const Lp = lNeeds ? `\\left(${Ls}\\right)` : Ls;
   const Rp = rNeeds ? `\\left(${Rs}\\right)` : Rs;
   const body = `${Lp}\\;${symLx}\\;${Rp}`;
-  if (!parentOp) return body;
-  return prec[parentOp] > prec[node.sym] ? `\\left(${body}\\right)` : body;
+  return body;
 }
 
 function generateQuestion() {
@@ -92,9 +100,57 @@ function generateQuestion() {
     guard++;
   }
 
+  function stripOuterParensAscii(s) {
+    s = s.trim();
+    while (s.startsWith('(') && s.endsWith(')')) {
+      let depth = 0, ok = true;
+      for (let i = 0; i < s.length; i++) {
+        const ch = s[i];
+        if (ch === '(') depth++;
+        else if (ch === ')') {
+          depth--;
+          if (depth === 0 && i !== s.length - 1) { ok = false; break; }
+        }
+      }
+      if (ok) s = s.slice(1, -1).trim(); else break;
+    }
+    return s;
+  }
+
+  function stripOuterParensLatex(s) {
+    s = s.trim();
+    const L = '\\left('; const R = '\\right)';
+    while (s.startsWith(L) && s.endsWith(R)) {
+      const inner = s.slice(L.length, s.length - R.length);
+      // Check matching of \left( .. \right) pairs inside
+      let depth = 0, ok = true;
+      for (let i = 0; i < inner.length; i++) {
+        if (inner.startsWith('\\left(', i)) { depth++; i += 5; }
+        else if (inner.startsWith('\\right)', i)) { depth--; i += 6; if (depth < 0) { ok = false; break; } }
+      }
+      if (ok && depth === 0) s = inner.trim(); else break;
+    }
+    return s;
+  }
+
+  function stripOuterPlainParens(s) {
+    s = s.trim();
+    while (s.startsWith('(') && s.endsWith(')')) {
+      const inner = s.slice(1, -1);
+      let depth = 0, ok = true;
+      for (let i = 0; i < inner.length; i++) {
+        const ch = inner[i];
+        if (ch === '(') depth++;
+        else if (ch === ')') { depth--; if (depth < 0) { ok = false; break; } }
+      }
+      if (ok && depth === 0) s = inner.trim(); else break;
+    }
+    return s;
+  }
+
   const val = evalTree(expr);
-  const ascii = toAscii(expr);
-  const latex = toLatex(expr);
+  const ascii = stripOuterParensAscii(toAscii(expr));
+  const latex = stripOuterPlainParens(stripOuterParensLatex(toLatex(expr)));
   console.log(`[Logic] L${level} :: ${ascii} = ${val}`);
   return { text: ascii, latex, answer: val };
 }
@@ -104,4 +160,3 @@ generateQuestion.bumpUp   = () => { level++; console.log('[Logic Level]', level)
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log('[Logic Level]', level); };
 
 export default { generateQuestion };
-

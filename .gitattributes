@@ -1,0 +1,12 @@
+# Normalize line endings and avoid CRLF churn
+
+# Treat all text files as text and enforce LF on checkout
+* text eol=lf
+
+# Binary assets (never modify line endings)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+

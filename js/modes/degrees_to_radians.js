@@ -1,5 +1,5 @@
-// Choice-based mode for converting degrees to radians.
-// Uses choiceShell.js: export default { choices, generateQuestion, enableNegToggle }
+// Choice-based mode with dynamic 6 choices per question (positive angles only).
+// Used with choiceDynamicShell.js via dynamicChoices flag.
 
 const CHOICES = [
   "0",
@@ -43,24 +43,34 @@ const DEG_TO_RAD = new Map([
 
 let level = 1;
 
-function pickDegree() {
+function pickDegreePositive() {
   const DEGS = Array.from(DEG_TO_RAD.keys());
-  const base = DEGS[Math.floor(Math.random() * DEGS.length)];
-  if (level <= 2) return base;
-  // Occasionally show negative degrees; user toggles '-' on the answer
-  if (Math.random() < Math.min(0.35, 0.1 * (level - 1))) return -base;
-  return base;
+  // filter to positive/zero only
+  const POS = DEGS.filter(d => d >= 0);
+  return POS[Math.floor(Math.random() * POS.length)];
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
 function generateQuestion() {
-  const deg = pickDegree();
-  const absDeg = Math.abs(deg);
-  const baseAns = DEG_TO_RAD.get(absDeg) || "0";
+  const deg = pickDegreePositive();
+  const correct = DEG_TO_RAD.get(deg) || "0";
+
+  // Build a dynamic set of 6 choices including the correct one
+  const pool = CHOICES.filter(x => x !== correct);
+  // choose 5 random distractors
+  const distractors = shuffle(pool.slice()).slice(0, 5);
+  const choicesLatex = shuffle([correct, ...distractors]);
+  const correctIndex = choicesLatex.indexOf(correct);
 
   const questionLatex = `${deg}^{\\circ}`;
-  const answerLatex = baseAns; // choiceShell adds '-' if the negate toggle is active
-
-  return { questionLatex, answerLatex };
+  return { questionLatex, choicesLatex, correctIndex };
 }
 
 generateQuestion.getLevel = () => level;
@@ -68,8 +78,6 @@ generateQuestion.bumpUp   = () => { level++; console.log("[Deg→Rad Level]", le
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log("[Deg→Rad Level]", level); };
 
 export default {
-  choices: CHOICES,
-  enableNegToggle: true,
+  dynamicChoices: true,
   generateQuestion,
 };
-

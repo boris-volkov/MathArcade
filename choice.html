@@ -26,11 +26,19 @@
 
   <script type="module">
     import { setupChoiceGame } from "./js/choiceShell.js";
-    // mode is chosen via ?mode=unitcircle (could add more choice-grid modes later)
+    import { setupDynamicChoiceGame } from "./js/choiceDynamicShell.js";
+    // mode is chosen via ?mode=unitcircle or others
     const mode = new URLSearchParams(location.search).get("mode") || "unitcircle";
     const path = `./js/modes/${mode}.js`;
     const mod = await import(path);
-    setupChoiceGame(mod.default);
+
+    const cfg = mod.default;
+    if (cfg && cfg.dynamicChoices) {
+      // expects { generateQuestion() -> {questionLatex, choicesLatex, correctIndex} }
+      setupDynamicChoiceGame({ generateQuestion: cfg.generateQuestion });
+    } else {
+      setupChoiceGame(cfg);
+    }
   </script>
 </body>
 </html>
