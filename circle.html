@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="choice-wrap">
+    <div id="question" style="font-size:clamp(1.4rem,4vw,2rem); min-height:2.4em;"></div>
+    <div id="circleMount"></div>
+    <div id="feedback"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+  <script type="module">
+    import { setupCircleGame } from "./js/circleShell.js";
+    const mode = new URLSearchParams(location.search).get("mode") || "unitcircle_click";
+    const path = `./js/modes/${mode}.js`;
+    const mod = await import(path);
+    setupCircleGame(mod.default);
+  </script>
+</body>
+</html>
+
