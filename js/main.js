@@ -10,6 +10,7 @@ const MODE_PATHS = {
   subtraction: "./modes/subtraction.js",
   division: "./modes/division.js",
   radians_to_degrees: "./modes/radians_to_degrees.js",
+  logic: "./modes/logic.js",
   lcm: "./modes/lcm.js",
   gcf: "./modes/gcf.js",
   integers: "./modes/integers.js", // NEW

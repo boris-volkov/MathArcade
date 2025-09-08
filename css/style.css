@@ -353,6 +353,12 @@ h1 {
   border-color: #38525a;
 }
 
+/* logic section: lighten a bit for contrast */
+.section--logic {
+  background: #2b2f33; /* lighter than others */
+  border-color: #5a6a73; /* softer, cooler border */
+}
+
 /* make menus lay out nicely inside sections */
 .section .menu {
   display: flex;
