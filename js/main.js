@@ -6,6 +6,10 @@ const mode = (params.get("mode") || "multiplication").toLowerCase();
 const MODE_PATHS = {
   multiplication: "./modes/multiplication.js",
   addition: "./modes/addition.js",
+  expressions: "./modes/expressions.js",
+  subtraction: "./modes/subtraction.js",
+  division: "./modes/division.js",
+  radians_to_degrees: "./modes/radians_to_degrees.js",
   lcm: "./modes/lcm.js",
   gcf: "./modes/gcf.js",
   integers: "./modes/integers.js", // NEW
