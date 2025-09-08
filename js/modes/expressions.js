@@ -80,6 +80,27 @@ function render(node) {
   return `${lTxt} ${node.op} ${rTxtRaw}`;
 }
 
+function renderLatex(node) {
+  if (node.kind === 'num') return String(node.val);
+
+  const Ls = renderLatex(node.left);
+  const Rs = renderLatex(node.right);
+
+  const lNeeds = node.left.kind === 'op' && prec[node.left.op] < prec[node.op];
+  const rNeeds = node.right.kind === 'op' && (prec[node.right.op] < prec[node.op] || (node.op === '-' && prec[node.right.op] === prec[node.op]));
+
+  const Lp = lNeeds ? `\\left(${Ls}\\right)` : Ls;
+  const Rp = rNeeds ? `\\left(${Rs}\\right)` : Rs;
+
+  if (node.op === '*') {
+    // Use an explicit multiplication dot in LaTeX for clarity
+    return `${Lp}\\cdot ${Rp}`;
+  }
+  if (node.op === '+') return `${Lp} + ${Rp}`;
+  if (node.op === '-') return `${Lp} - ${Rp}`;
+  return `${Lp} ${node.op} ${Rp}`;
+}
+
 function countLeaves(node) {
   if (node.kind === 'num') return 1;
   return countLeaves(node.left) + countLeaves(node.right);
@@ -94,7 +115,7 @@ function generateQuestion() {
     return roll < 0.50 ? 3 : 4;
   })();
 
-  let expr, val, text;
+  let expr, val, text, latex;
   let guard = 0;
   const LIMIT = Math.min(499, 60 * level);
   const budget = mulBudgetFromLevel(level);
@@ -105,6 +126,7 @@ function generateQuestion() {
     expr = buildExpr(depth, budget);
     val = evalExpr(expr);
     text = render(expr);
+    latex = renderLatex(expr);
     guard++;
   } while (
     guard < 20 && (
@@ -116,7 +138,7 @@ function generateQuestion() {
   );
 
   console.log(`[Expr] L${level} leaves=${countLeaves(expr)} :: ${text} = ${val}`);
-  return { text, answer: val };
+  return { text, latex, answer: val };
 }
 
 generateQuestion.getLevel = () => level;
