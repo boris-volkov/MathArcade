@@ -12,10 +12,12 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   const qEl = $("#question");
   const feedbackEl = $("#feedback");
 
-  const SIZE = 360; // px
+  const SIZE = 360; // internal coordinate system (scales via viewBox)
   const cx = SIZE / 2;
   const cy = SIZE / 2;
-  const r = SIZE * 0.36;
+  // Make the circle nearly edge-to-edge, leaving margin for dot/stroke
+  const MARGIN = 14; // px in SVG coords
+  const r = (SIZE / 2) - MARGIN;
   const N = 12; // standard positions (π/6 increments)
 
   // Build SVG
