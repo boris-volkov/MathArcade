@@ -273,6 +273,13 @@ h1 {
   justify-items: center;
 }
 
+/* Responsive sizing for the SVG circle board: near-full width on phones, capped on desktop */
+.circle-svg {
+  width: min(90vw, 320px);
+  height: auto;
+  display: block;
+}
+
 #answerGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(90px, 1fr));

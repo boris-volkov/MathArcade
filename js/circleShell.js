@@ -22,10 +22,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   const svgNS = "http://www.w3.org/2000/svg";
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("viewBox", `0 0 ${SIZE} ${SIZE}`);
-  svg.setAttribute("width", String(SIZE));
-  svg.setAttribute("height", String(SIZE));
-  svg.style.maxWidth = "75vw";
-  svg.style.maxHeight = "75vw";
+  svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg.classList.add("circle-svg");
 
   const ring = document.createElementNS(svgNS, "circle");
   ring.setAttribute("cx", String(cx));
