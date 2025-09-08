@@ -275,8 +275,8 @@ h1 {
 
 /* Responsive sizing for the SVG circle board: near-full width on phones, capped on desktop */
 .circle-svg {
-  /* Fill available viewport width minus body padding; cap for desktop */
-  width: min(calc(100vw - 2rem), 600px);
+  /* ~90% viewport width on phones; cap on desktop */
+  width: min(90vw, 600px);
   height: auto;
   display: block;
 }

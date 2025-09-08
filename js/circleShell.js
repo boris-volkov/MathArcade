@@ -11,6 +11,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   const mount = $("#circleMount");
   const qEl = $("#question");
   const feedbackEl = $("#feedback");
+  const statsEl = $("#stats");
 
   const SIZE = 360; // internal coordinate system (scales via viewBox)
   const cx = SIZE / 2;
@@ -48,8 +49,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     line.setAttribute("x2", String(x));
     line.setAttribute("y2", String(y));
     line.setAttribute("stroke", isQuadrantal ? "#4caf50" : "#5a80a3");
-    line.setAttribute("stroke-opacity", isQuadrantal ? "0.35" : "0.25");
-    line.setAttribute("stroke-width", "1");
+    line.setAttribute("stroke-opacity", isQuadrantal ? "0.28" : "0.18");
+    line.setAttribute("stroke-width", "2");
     line.setAttribute("stroke-linecap", "round");
     line.style.pointerEvents = "none"; // visual only
     svg.appendChild(line);
@@ -64,7 +65,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     const c = document.createElementNS(svgNS, "circle");
     c.setAttribute("cx", String(x));
     c.setAttribute("cy", String(y));
-    c.setAttribute("r", String(10));
+    c.setAttribute("r", String(12));
     // Color scheme: multiples of 90° (k%3==0) green; others (30° multiples) blue.
     // Note: 45° multiples not on 12-point grid except quadrantal; we reserve red for future overlay.
     const isQuadrantal = (k % 3) === 0;
@@ -111,8 +112,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     ray.setAttribute("x2", String(x));
     ray.setAttribute("y2", String(y));
     ray.setAttribute("stroke", "#b74e4e");
-    ray.setAttribute("stroke-opacity", "0.35");
-    ray.setAttribute("stroke-width", "1");
+    ray.setAttribute("stroke-opacity", "0.22");
+    ray.setAttribute("stroke-width", "2");
     ray.setAttribute("stroke-linecap", "round");
     ray.style.pointerEvents = "none";
     svg.appendChild(ray);
@@ -121,7 +122,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     const dot = document.createElementNS(svgNS, "circle");
     dot.setAttribute("cx", String(x));
     dot.setAttribute("cy", String(y));
-    dot.setAttribute("r", String(9));
+    dot.setAttribute("r", String(11));
     dot.setAttribute("fill", "#3a2626");
     dot.setAttribute("stroke", "#b74e4e");
     dot.setAttribute("stroke-width", "2");
@@ -137,9 +138,27 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   // State
   let answerIndex = -1;
   let questionStartAt = performance.now();
+  let start = performance.now();
+  let correct = 0, total = 0;
+  let lastKey = null;
+
+  function updateStats() {
+    if (!statsEl) return;
+    const elapsed = (performance.now() - start) / 1000;
+    const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
+    statsEl.innerHTML = `Correct: ${correct}<br>Total: ${total}<br>Rate: ${rate} per min`;
+  }
 
   function setQuestion() {
-    const q = generateQuestion();
+    let q = generateQuestion();
+    let key = `${q.answerIndex}|${q.questionLatex ?? ''}`;
+    let guard = 0;
+    while (lastKey !== null && key === lastKey && guard < 5) {
+      q = generateQuestion();
+      key = `${q.answerIndex}|${q.questionLatex ?? ''}`;
+      guard++;
+    }
+    lastKey = key;
     answerIndex = q.answerIndex;
     qEl.innerHTML = "";
     try { katex.render(q.questionLatex, qEl, { throwOnError: false }); }
@@ -154,6 +173,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   function onPick(idx) {
     if (idx === answerIndex) {
       feedbackEl.textContent = "Correct!";
+      correct++; total++;
+      updateStats();
       const dt = performance.now() - questionStartAt;
       if (typeof generateQuestion.bumpUp === "function") {
         let delta = Math.floor((TARGET_MS - dt) / 1000);
@@ -169,6 +190,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
       setTimeout(setQuestion, nextDelayMs);
     } else {
       feedbackEl.textContent = "Try again!";
+      total++;
+      updateStats();
     }
   }
 
@@ -180,4 +203,5 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   });
 
   setQuestion();
+  updateStats();
 }
