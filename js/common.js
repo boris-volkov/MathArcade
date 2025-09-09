@@ -75,9 +75,18 @@ if (clearBtn) {
   let fastStreak = 0;
   let lastCorrectAt = performance.now();
 
-  // Time-based leveling parameters
-  const TARGET_MS = 5000;  // 5 seconds sweet spot
-  const MAX_STEP = 3;      // clamp level change per question
+  // Time-based leveling parameters (smoothed)
+  const TARGET_MS = 5000;    // 5 seconds sweet spot
+  const EMA_ALPHA = 0.35;    // weight of the latest dt in EMA
+  const PROGRESS_GAIN = 0.6; // max progress magnitude per answer
+  const START_MIN_TOTAL = 6; // wait for a few answers before adapting
+  const COOLDOWN_Q = 2;      // min questions between level changes
+
+  // Smoothed adaptive state
+  let totalAnswered = 0;     // number of correct answers given
+  let emaDt = null;          // exponential moving average of dt
+  let progress = 0;          // fractional progress toward next level change
+  let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
 
 
   function checkAnswer_old() {
@@ -120,35 +129,52 @@ if (clearBtn) {
     }
   }
 
-  // New time-based leveling checkAnswer
+  // New time-based leveling checkAnswer (smoothed)
   function checkAnswer() {
     const guess = parseInt(answerEl.value, 10);
     if (!Number.isFinite(guess)) return;
 
     if (guess === currentAnswer) {
-      feedbackEl.textContent = "Correct!";
+      // Visual-only success flash; no text
+      feedbackEl.textContent = "";
+      answerEl.classList.add("correct");
+      setTimeout(() => answerEl.classList.remove("correct"), 150);
 
       const now = performance.now();
       const dt = now - questionStartAt; // time spent on this question
 
       if (typeof generateQuestion.bumpUp === "function") {
-        // +1 per second faster than 5s, -1 per second slower; clamp +/-3
-        let delta = Math.floor((TARGET_MS - dt) / 1000);
-        if (delta > MAX_STEP) delta = MAX_STEP;
-        if (delta < -MAX_STEP) delta = -MAX_STEP;
-        if (delta !== 0) {
-          const steps = Math.abs(delta);
-          for (let i = 0; i < steps; i++) {
-            if (delta > 0) generateQuestion.bumpUp();
-            else generateQuestion.bumpDown();
+        // Update EMA and progress; use cooldown and gating to smooth changes
+        totalAnswered++;
+        emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
+
+        if (totalAnswered >= START_MIN_TOTAL) {
+          let inc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
+          if (inc > PROGRESS_GAIN) inc = PROGRESS_GAIN;
+          if (inc < -PROGRESS_GAIN) inc = -PROGRESS_GAIN;
+          progress += inc;
+
+          // Enforce question-count cooldown between level changes
+          const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
+
+          if (progress >= 1 && canChange) {
+            generateQuestion.bumpUp();
+            progress -= 1;
+            lastChangeAtTotal = totalAnswered;
+          } else if (progress <= -1 && canChange) {
+            generateQuestion.bumpDown();
+            progress += 1;
+            lastChangeAtTotal = totalAnswered;
           }
+
+          console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} inc=${inc.toFixed(2)} prog=${progress.toFixed(2)}`);
         }
-        console.log(`[Pace] dt=${dt.toFixed(0)}ms delta=${delta}`);
       }
 
       setTimeout(newQuestion, nextDelayMs);
     } else {
-      feedbackEl.textContent = "Try again!";
+      // Visual-only error flash; no text
+      feedbackEl.textContent = "";
       // Clear previous attempt on wrong answer
       answerEl.value = "";
       answerEl.classList.add("wrong");

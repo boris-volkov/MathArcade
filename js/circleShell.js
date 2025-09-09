@@ -35,6 +35,10 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   ring.setAttribute("fill", "none");
   ring.setAttribute("stroke", "#635c5c");
   ring.setAttribute("stroke-width", "2");
+  // store base stroke styling for flash restore
+  ring.dataset.baseStroke = "#635c5c";
+  ring.dataset.baseStrokeOpacity = ring.getAttribute("stroke-opacity") || "1";
+  ring.dataset.baseStrokeWidth = "2";
   svg.appendChild(ring);
 
   // Map rays by unified 24-step index for highlighting
@@ -63,6 +67,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     line.dataset.m24 = String(m24);
     line.dataset.baseOpacity = baseOpacity;
     line.dataset.baseWidth = baseWidth;
+    line.dataset.baseStroke = stroke;
     raysByM24.set(m24, line);
     svg.appendChild(line);
   }
@@ -190,8 +195,10 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     if (highlightedRay) {
       const baseOp = highlightedRay.dataset.baseOpacity || "0.2";
       const baseW = highlightedRay.dataset.baseWidth || "2";
+      const baseStroke = highlightedRay.dataset.baseStroke || highlightedRay.getAttribute("stroke") || "#5a80a3";
       highlightedRay.setAttribute("stroke-opacity", baseOp);
       highlightedRay.setAttribute("stroke-width", baseW);
+      highlightedRay.setAttribute("stroke", baseStroke);
       highlightedRay = null;
     }
     if (highlightedDot) {
@@ -259,6 +266,39 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     highlightedDot = dotEl;
   }
 
+  const WRONG_FLASH_MS = 150;
+
+  function normalizeRays() {
+    // Restore all rays to their base styles
+    raysByM24.forEach((line) => {
+      const baseStroke = line.dataset.baseStroke || line.getAttribute("stroke") || "#5a80a3";
+      const baseOp = line.dataset.baseOpacity || line.getAttribute("stroke-opacity") || "0.18";
+      const baseW = line.dataset.baseWidth || line.getAttribute("stroke-width") || "2";
+      line.setAttribute("stroke", baseStroke);
+      line.setAttribute("stroke-opacity", baseOp);
+      line.setAttribute("stroke-width", baseW);
+    });
+  }
+
+  function flashWrong(dotEl) {
+    // Flash the outer ring red briefly, and tint the dot
+    const baseStroke = ring.dataset.baseStroke || ring.getAttribute("stroke") || "#635c5c";
+    const baseOp = ring.dataset.baseStrokeOpacity || ring.getAttribute("stroke-opacity") || "1";
+    ring.setAttribute("stroke", "#b74e4e");
+    ring.setAttribute("stroke-opacity", "1");
+    if (dotEl) {
+      dotEl.setAttribute("fill", "#b74e4e");
+      dotEl.setAttribute("fill-opacity", "1");
+      dotEl.setAttribute("stroke", "#ef9a9a");
+      dotEl.setAttribute("stroke-opacity", "1");
+    }
+    setTimeout(() => {
+      ring.setAttribute("stroke", baseStroke);
+      ring.setAttribute("stroke-opacity", baseOp);
+      resetHighlight();
+    }, WRONG_FLASH_MS);
+  }
+
   function setQuestion() {
     let q = generateQuestion();
     let key = `${q.answerIndex}|${q.questionLatex ?? ''}`;
@@ -274,33 +314,56 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     try { katex.render(q.questionLatex, qEl, { throwOnError: false }); }
     catch { qEl.textContent = q.questionLatex; }
     feedbackEl.textContent = "";
+    normalizeRays();
     resetHighlight();
     questionStartAt = performance.now();
   }
 
-  const TARGET_MS = 5000;
-  const MAX_STEP = 2;
+  // Smoothed adaptive parameters/state
+  const TARGET_MS = 5000;      // 5s sweet spot
+  const EMA_ALPHA = 0.35;      // EMA smoothing factor
+  const PROGRESS_GAIN = 0.6;   // max progress magnitude per answer
+  const START_MIN_TOTAL = 6;   // wait for a few answers before adapting
+  const COOLDOWN_Q = 2;        // min questions between level changes
+  let totalAnswered = 0;       // count of correct answers
+  let emaDt = null;            // EMA of response time
+  let progress = 0;            // fractional progress toward next level change
+  let lastChangeAtTotal = -9999; // index when last change occurred
 
-  function onPick(idx) {
+  function onPick(idx, dotEl) {
     if (idx === answerIndex) {
       feedbackEl.textContent = "Correct!";
       correct++; total++;
       updateStats();
       const dt = performance.now() - questionStartAt;
       if (typeof generateQuestion.bumpUp === "function") {
-        let delta = Math.floor((TARGET_MS - dt) / 1000);
-        if (delta > MAX_STEP) delta = MAX_STEP;
-        if (delta < -MAX_STEP) delta = -MAX_STEP;
-        if (delta !== 0) {
-          const steps = Math.abs(delta);
-          for (let i = 0; i < steps; i++) {
-            if (delta > 0) generateQuestion.bumpUp(); else generateQuestion.bumpDown();
+        totalAnswered++;
+        emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
+
+        if (totalAnswered >= START_MIN_TOTAL) {
+          let inc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
+          if (inc > PROGRESS_GAIN) inc = PROGRESS_GAIN;
+          if (inc < -PROGRESS_GAIN) inc = -PROGRESS_GAIN;
+          progress += inc;
+
+          const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
+          if (progress >= 1 && canChange) {
+            generateQuestion.bumpUp();
+            progress -= 1;
+            lastChangeAtTotal = totalAnswered;
+          } else if (progress <= -1 && canChange) {
+            generateQuestion.bumpDown();
+            progress += 1;
+            lastChangeAtTotal = totalAnswered;
           }
+          console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} inc=${inc.toFixed(2)} prog=${progress.toFixed(2)}`);
         }
       }
       setTimeout(setQuestion, nextDelayMs);
     } else {
-      feedbackEl.textContent = "Try again!";
+      // Flash red on wrong answer and revert
+      feedbackEl.textContent = "";
+      flashWrong(dotEl);
       total++;
       updateStats();
     }
@@ -311,7 +374,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
       const m = d.dataset.m24 != null ? Number(d.dataset.m24) : Number(d.dataset.index);
       highlightRay(m);
       highlightDot(d);
-      onPick(m);
+      onPick(m, d);
     });
   });
 
