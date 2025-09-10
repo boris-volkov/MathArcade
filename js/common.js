@@ -9,10 +9,22 @@ export function setupGame({ title, generateQuestion, nextDelayMs = 250, flashMs 
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  // Detect mode from URL to decide which UI to show
+  const params = new URLSearchParams(location.search);
+  const mode = (params.get('mode') || 'multiplication').toLowerCase();
+  const SHOW_LEVEL_FOR = new Set([
+    'addition', 'subtraction', 'multiplication', 'division', 'lcm', 'gcf', 'integers',
+    // include boolean expressions mode
+    'logic',
+  ]);
+  const showLevelUI = SHOW_LEVEL_FOR.has(mode);
+
   const titleEl = $("h1");
   const questionEl = $("#question");
   const answerEl = $("#answer");
   const feedbackEl = $("#feedback");
+  const levelEl = $("#levelIndicator");
+  const statsEl = $("#stats");
   const buttons = $$(".numpad button");
   const clearBtn = document.querySelector("#clearBtn");
 if (clearBtn) {
@@ -25,6 +37,8 @@ if (clearBtn) {
   let currentAnswer = null;
   let lastQuestionKey = null;
   let questionStartAt = performance.now();
+  const sessionStartAt = performance.now();
+  let correctCount = 0;
 
   function getQuestionKey(q) {
     if (q && typeof q.key === "string" && q.key.length) return q.key;
@@ -58,6 +72,8 @@ if (clearBtn) {
     if (typeof generateQuestion.getLevel === "function") {
       console.log("[Level]", generateQuestion.getLevel());
     }
+    updateLevelIndicator();
+    updateStats();
     currentAnswer = answer;
     // Prefer LaTeX rendering if provided and KaTeX is available
     if (latex && window.katex) {
@@ -87,6 +103,39 @@ if (clearBtn) {
   let emaDt = null;          // exponential moving average of dt
   let progress = 0;          // fractional progress toward next level change
   let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
+
+  function updateLevelIndicator() {
+    if (!levelEl) return;
+    // Toggle visibility based on mode
+    levelEl.style.display = showLevelUI ? '' : 'none';
+    if (!showLevelUI) return; // don't populate when hidden
+    try {
+      const hasFn = typeof generateQuestion.getLevel === "function";
+      if (hasFn) {
+        const lvl = generateQuestion.getLevel();
+        if (Number.isFinite(lvl)) {
+          levelEl.textContent = `Level: ${lvl}`;
+          return;
+        }
+      }
+      // If not applicable, show nothing
+      levelEl.textContent = "";
+    } catch {
+      levelEl.textContent = "";
+    }
+  }
+
+  function updateStats() {
+    if (!statsEl) return;
+    // Stats visible only for non-level modes (algebra/trig)
+    const showStats = !showLevelUI;
+    statsEl.style.display = showStats ? '' : 'none';
+    if (!showStats) return;
+    const minutes = Math.max(0.001, (performance.now() - sessionStartAt) / 60000);
+    const rate = correctCount / minutes; // correct per minute
+    const rateDisp = rate < 10 ? rate.toFixed(1) : Math.round(rate);
+    statsEl.textContent = `Correct: ${correctCount}  |  Rate: ${rateDisp}/min`;
+  }
 
 
   function checkAnswer_old() {
@@ -143,6 +192,10 @@ if (clearBtn) {
       const now = performance.now();
       const dt = now - questionStartAt; // time spent on this question
 
+      // increment stats for correct answers (for algebra/trig views)
+      correctCount++;
+      updateStats();
+
       if (typeof generateQuestion.bumpUp === "function") {
         // Update EMA and progress; use cooldown and gating to smooth changes
         totalAnswered++;
@@ -159,10 +212,12 @@ if (clearBtn) {
 
           if (progress >= 1 && canChange) {
             generateQuestion.bumpUp();
+            updateLevelIndicator();
             progress -= 1;
             lastChangeAtTotal = totalAnswered;
           } else if (progress <= -1 && canChange) {
             generateQuestion.bumpDown();
+            updateLevelIndicator();
             progress += 1;
             lastChangeAtTotal = totalAnswered;
           }
