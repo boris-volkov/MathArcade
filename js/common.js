@@ -16,6 +16,8 @@ export function setupGame({ title, generateQuestion, nextDelayMs = 250, flashMs 
     'addition', 'subtraction', 'multiplication', 'division', 'lcm', 'gcf', 'integers',
     // include boolean expressions mode
     'logic',
+    // show level for arithmetic expressions as well
+    'expressions',
   ]);
   const showLevelUI = SHOW_LEVEL_FOR.has(mode);
 
@@ -39,6 +41,7 @@ if (clearBtn) {
   let questionStartAt = performance.now();
   const sessionStartAt = performance.now();
   let correctCount = 0;
+  let totalCount = 0;
 
   function getQuestionKey(q) {
     if (q && typeof q.key === "string" && q.key.length) return q.key;
@@ -134,7 +137,8 @@ if (clearBtn) {
     const minutes = Math.max(0.001, (performance.now() - sessionStartAt) / 60000);
     const rate = correctCount / minutes; // correct per minute
     const rateDisp = rate < 10 ? rate.toFixed(1) : Math.round(rate);
-    statsEl.textContent = `Correct: ${correctCount}  |  Rate: ${rateDisp}/min`;
+    // Match unit circle formatting: include total and line break
+    statsEl.innerHTML = `Correct: ${correctCount}/${totalCount}<br>Rate: ${rateDisp} per min`;
   }
 
 
@@ -194,6 +198,7 @@ if (clearBtn) {
 
       // increment stats for correct answers (for algebra/trig views)
       correctCount++;
+      totalCount++;
       updateStats();
 
       if (typeof generateQuestion.bumpUp === "function") {
@@ -234,6 +239,9 @@ if (clearBtn) {
       answerEl.value = "";
       answerEl.classList.add("wrong");
       setTimeout(() => answerEl.classList.remove("wrong"), 150);
+      // count attempt for stats and refresh (for modes that show stats)
+      totalCount++;
+      updateStats();
     }
   }
   // Shared action handler (used by both pointer and keyboard)
