@@ -25,6 +25,10 @@ export function setupDynamicChoiceGame({
     btn.classList.add("active");
     setTimeout(() => btn.classList.remove("active"), flashMs);
   }
+  function flashWrong(btn) {
+    btn.classList.add("wrong");
+    setTimeout(() => btn.classList.remove("wrong"), flashMs);
+  }
 
   function katexRender(target, latex) {
     target.innerHTML = "";
@@ -64,8 +68,7 @@ export function setupDynamicChoiceGame({
       const btn = document.createElement("button");
       btn.className = "answerBtn";
       btn.addEventListener("click", () => {
-        flash(btn);
-        onChoice(i);
+        onChoice(i, btn);
       });
       grid.appendChild(btn);
       katexRender(btn, lx);
@@ -74,15 +77,17 @@ export function setupDynamicChoiceGame({
     feedbackEl.textContent = "";
   }
 
-  function onChoice(i) {
+function onChoice(i, btn) {
     total++;
     if (i === currentCorrectIndex) {
       correct++;
+      if (btn) flash(btn);
       feedbackEl.textContent = "✓ Correct!";
       feedbackEl.style.color = "#2e7d32";
       updateStats();
       setTimeout(buildForQuestion, nextDelayMs);
     } else {
+      if (btn) flashWrong(btn);
       feedbackEl.textContent = "✗ Try again";
       feedbackEl.style.color = "#c62828";
       updateStats();

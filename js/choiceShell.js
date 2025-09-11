@@ -41,6 +41,10 @@ export function setupChoiceGame({
     btn.classList.add("active");
     setTimeout(() => btn.classList.remove("active"), flashMs);
   }
+  function flashWrong(btn) {
+    btn.classList.add("wrong");
+    setTimeout(() => btn.classList.remove("wrong"), flashMs);
+  }
 
   // Build buttons (after neg toggle)
   function buildButtons() {
@@ -53,8 +57,7 @@ export function setupChoiceGame({
       btn.className = "answerBtn";
       btn.dataset.answer = ch;
       btn.addEventListener("click", () => {
-        flash(btn);
-        onAnswerClick(ch);
+        onAnswerClick(ch, btn);
       });
       grid.appendChild(btn);
       answerButtons.push(btn);
@@ -133,12 +136,13 @@ export function setupChoiceGame({
     feedbackEl.textContent = "";
   }
 
-  function onAnswerClick(choiceLatex) {
+  function onAnswerClick(choiceLatex, btn) {
     const user = (enableNegToggle && negateActive && choiceLatex !== "undef")
       ? negateLatex(choiceLatex)
       : choiceLatex;
 
     if (isCorrect(user, currentAnswerLatex)) {
+      if (btn) flash(btn);
       feedbackEl.textContent = "✓ Correct!";
       feedbackEl.style.color = "#2e7d32";
       correct++; total++;
@@ -149,6 +153,7 @@ export function setupChoiceGame({
         negToggle.classList.remove("active");
       }, nextDelayMs);
     } else {
+      if (btn) flashWrong(btn);
       feedbackEl.textContent = "✗ Try again";
       feedbackEl.style.color = "#c62828";
       total++;

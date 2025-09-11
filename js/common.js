@@ -4,8 +4,14 @@ export const math = {
   lcm(a, b) { return Math.abs(a * b) / math.gcd(a, b); },
 };
 
-// Shared game wiring; takes a mode config {title, generateQuestion, nextDelayMs?, flashMs?}
-export function setupGame({ title, generateQuestion, nextDelayMs = 250, flashMs = 150 }) {
+// Shared game wiring; takes a mode config
+// { title?, generateQuestion, nextDelayMs?, flashMs?,
+//   timing?: { baseMs?:number, perLevelMs?:number, maxMs?:number },
+//   targetMs?: number,                   // shorthand for timing.baseMs
+//   getTargetMs?: ({level}) => number    // full override if provided
+// }
+export function setupGame(config) {
+  const { title, generateQuestion, nextDelayMs = 250, flashMs = 150 } = config || {};
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
@@ -95,7 +101,45 @@ if (clearBtn) {
   let lastCorrectAt = performance.now();
 
   // Time-based leveling parameters (smoothed)
-  const TARGET_MS = 5000;    // 5 seconds sweet spot
+  const DEFAULT_BASE_MS = 5000;      // baseline sweet spot at level 1
+  const DEFAULT_PER_LEVEL_MS = 300;  // default +300ms per level above 1
+  function getTargetMs() {
+    // Full override if mode provides a function
+    try {
+      if (config && typeof config.getTargetMs === 'function') {
+        const lvl = (typeof generateQuestion?.getLevel === 'function') ? Number(generateQuestion.getLevel()) : 1;
+        const t = config.getTargetMs({ level: Number.isFinite(lvl) ? lvl : 1 });
+        if (Number.isFinite(t)) return t;
+      }
+    } catch {}
+
+    // Otherwise compose from per-mode timing or fallbacks
+    let base = DEFAULT_BASE_MS;
+    let perLevel = DEFAULT_PER_LEVEL_MS;
+    let maxMs = Infinity;
+    try {
+      if (config) {
+        if (Number.isFinite(config.targetMs)) base = config.targetMs; // shorthand
+        if (config.timing && typeof config.timing === 'object') {
+          if (Number.isFinite(config.timing.baseMs)) base = config.timing.baseMs;
+          if (Number.isFinite(config.timing.perLevelMs)) perLevel = config.timing.perLevelMs;
+          if (Number.isFinite(config.timing.maxMs)) maxMs = config.timing.maxMs;
+        }
+      }
+    } catch {}
+
+    let lvl = 1;
+    try {
+      if (typeof generateQuestion?.getLevel === 'function') {
+        const v = Number(generateQuestion.getLevel());
+        if (Number.isFinite(v)) lvl = v;
+      }
+    } catch {}
+
+    let t = base + Math.max(0, (lvl - 1)) * perLevel;
+    if (Number.isFinite(maxMs)) t = Math.min(t, maxMs);
+    return t;
+  }
   const EMA_ALPHA = 0.35;    // weight of the latest dt in EMA
   const PROGRESS_GAIN = 0.6; // max progress magnitude per answer
   const START_MIN_TOTAL = 6; // wait for a few answers before adapting
@@ -207,6 +251,7 @@ if (clearBtn) {
         emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
 
         if (totalAnswered >= START_MIN_TOTAL) {
+          const TARGET_MS = getTargetMs();
           let inc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
           if (inc > PROGRESS_GAIN) inc = PROGRESS_GAIN;
           if (inc < -PROGRESS_GAIN) inc = -PROGRESS_GAIN;

@@ -1,8 +1,8 @@
 let level = 1;
 
 function maxNumber(lv) { return Math.min(4 + 2 * lv, 20); }
-function maxDepth(lv)  { return Math.min(1 + Math.floor((lv - 1) / 2), 4); }
-function mulBudgetFromLevel(lv) { return Math.min(1 + Math.floor((lv - 1) / 4), 2); } // cap at 2 multiplications
+function maxDepth(lv)  { return Math.min(1 + Math.floor((lv - 1) / 2), 6); }
+function mulBudgetFromLevel(lv) { return Math.min(1 + Math.floor((lv - 1) / 4), 3); } // cap at 3 multiplications
 
 function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
@@ -22,6 +22,14 @@ function buildExpr(depth, mulBudget) {
   // Randomize subtree depths to create 2, 3, or 4-term expressions (when depth≈2)
   let leftDepth  = ri(0, Math.max(0, depth - 1));
   let rightDepth = ri(0, Math.max(0, depth - 1));
+  const chainBias = Math.min(0.10 + 0.05 * level, 0.55);
+  if (Math.random() < chainBias && depth > 1) {
+    if (Math.random() < 0.5) {
+      leftDepth = depth - 1;
+    } else {
+      rightDepth = depth - 1;
+    }
+  }
 
   // Split remaining multiplication budget between branches to cap total '*'
   const split = nextBudget > 0 ? ri(0, nextBudget) : 0;
@@ -107,13 +115,28 @@ function countLeaves(node) {
 }
 
 function generateQuestion() {
-  // Aim for at least 3 numbers (3 or 4) with some variety
-  const desiredLeaves = (function(){
-    const roll = Math.random();
-    if (level <= 2) return roll < 0.85 ? 3 : 4;
-    if (level <= 4) return roll < 0.65 ? 3 : 4;
-    return roll < 0.50 ? 3 : 4;
-  })();
+  // Scale terms with level: up to 6 terms at higher levels
+  function desiredLeavesFromLevel(lv) {
+    const r = Math.random();
+    if (lv <= 2) {
+      return r < 0.85 ? 3 : 4;
+    } else if (lv <= 4) {
+      if (r < 0.55) return 3;
+      if (r < 0.90) return 4;
+      return 5;
+    } else if (lv <= 6) {
+      if (r < 0.15) return 3;
+      if (r < 0.65) return 4;
+      if (r < 0.95) return 5;
+      return 6;
+    } else if (lv <= 8) {
+      if (r < 0.10) return 4;
+      if (r < 0.65) return 5;
+      return 6;
+    }
+    return r < 0.25 ? 5 : 6;
+  }
+  const desiredLeaves = desiredLeavesFromLevel(level);
 
   let expr, val, text, latex;
   let guard = 0;
@@ -129,7 +152,7 @@ function generateQuestion() {
     latex = renderLatex(expr);
     guard++;
   } while (
-    guard < 20 && (
+    guard < 60 && (
       Math.abs(val) > LIMIT ||
       /(\(\s*\))/.test(text) ||
       text.length < 3 ||
@@ -137,7 +160,7 @@ function generateQuestion() {
     )
   );
 
-  console.log(`[Expr] L${level} leaves=${countLeaves(expr)} :: ${text} = ${val}`);
+  console.log(`[Expr] L${level} leaves=${countLeaves(expr)} depth=${depth} :: ${text} = ${val}`);
   return { text, latex, answer: val };
 }
 
@@ -145,4 +168,4 @@ generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp   = () => { level++; console.log('[Level]', level); };
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log('[Level]', level); };
 
-export default { generateQuestion };
+export default { generateQuestion, timing: { baseMs: 8000 } };

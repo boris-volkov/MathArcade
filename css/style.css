@@ -313,6 +313,10 @@ h1 {
   background: #b7f7b7;
 }
 
+#answerGrid button.wrong {
+  background: #f28a8a;
+}
+
 #negToggle {
   font-weight: 700;
   font-size: 1.4rem;

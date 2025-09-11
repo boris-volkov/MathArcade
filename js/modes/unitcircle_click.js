@@ -31,7 +31,7 @@ function pickM() {
 function generateQuestion() {
   const m = pickM();
   let displayNumerator = m;
-  if (level > 20) {
+  if (level > 4) {
     const roll = Math.random();
     if (roll < 0.5 && m !== 0) {
       // Show as a negative equivalent: -( (24 - m) mod 24 )
