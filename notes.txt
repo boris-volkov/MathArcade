@@ -1,4 +1,14 @@
 TODO:
-make a boolean expression quiz
-basic exponent quiz
 CANICANID quiz??
+more difficutly ramping and longer expressions
+standardize the correct | rate display using line break
+trig functions flash red on wrong answer
+    factoring flash red
+    degrees to radians flash red
+    
+go faster into negatives in the unit circle quiz 
+have expressions display level
+
+simplifying fractions game
+allow fraction entry in the logarithms section
+
