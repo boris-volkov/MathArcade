@@ -82,13 +82,13 @@ function onChoice(i, btn) {
     if (i === currentCorrectIndex) {
       correct++;
       if (btn) flash(btn);
-      feedbackEl.textContent = "✓ Correct!";
+      feedbackEl.textContent = "Correct!";
       feedbackEl.style.color = "#2e7d32";
       updateStats();
       setTimeout(buildForQuestion, nextDelayMs);
     } else {
       if (btn) flashWrong(btn);
-      feedbackEl.textContent = "✗ Try again";
+      feedbackEl.textContent = "Try again";
       feedbackEl.style.color = "#c62828";
       updateStats();
     }

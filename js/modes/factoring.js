@@ -34,6 +34,23 @@ function expand(u, v, w, z) {
   return { A: u * w, B: u * z + v * w, C: v * z };
 }
 
+// Return positive divisors of n (n >= 0). For n=0, return [].
+function divisors(n) {
+  n = Math.abs(n);
+  if (n === 0) return [];
+  const out = new Set();
+  for (let i = 1; i * i <= n; i++) {
+    if (n % i === 0) { out.add(i); out.add(n / i); }
+  }
+  return Array.from(out).sort((a, b) => a - b);
+}
+
+// Check if (U x + V)(W x + Z) expands to Ax^2 + Bx + C
+function isCorrectFactorization(U, V, W, Z, A, B, C) {
+  const e = expand(U, V, W, Z);
+  return e.A === A && e.B === B && e.C === C;
+}
+
 // KaTeX-friendly formatting (no trailing equals)
 function sign(n) { return n < 0 ? " - " : " + "; }
 function formatPoly(A, B, C) {
@@ -89,14 +106,58 @@ function generateQuestion() {
     if (!seen.has(latex)) { seen.add(latex); choices.push(latex); }
   }
 
-  // structured plausible distractors (always canonicalize)
-  addChoice(u, v + 1, w, z - 1);
-  addChoice(u, v - 1, w, z + 1);
-  addChoice(u, -v,    w, -z);      // flip constants
-  addChoice(w, z,     u, v);       // swap factor order
+  // Improved distractors: preserve A and C via factor pairs, alter B.
+  // Mirrors the Python idea: pick f|A and l|C with random sign on constants.
 
-  // pad to at least 6 with gentle random tweaks that keep readability
-  while (choices.length < 6) {
+  function addWrongByProducts(targetCount = 5) {
+    const Fs = divisors(Math.abs(A)); // positive divisors of A (A>=1 here)
+
+    // Handle C == 0 separately since divisors(0) is undefined.
+    if (C === 0) {
+      let tries = 0;
+      while (choices.length < targetCount && tries++ < 200) {
+        const f = Fs[Math.floor(Math.random() * Fs.length)];
+        const U = f;
+        const W = A / f;
+        const zeroOnV = Math.random() < 0.5;
+        let V, Z;
+        if (zeroOnV) {
+          V = 0;
+          // choose a modest Z to keep expressions readable
+          Z = nz(-9, 9);
+        } else {
+          Z = 0;
+          V = nz(-9, 9);
+        }
+        if (isCorrectFactorization(U, V, W, Z, A, B, C)) continue;
+        addChoice(U, V, W, Z);
+      }
+      return;
+    }
+
+    const Ls = divisors(Math.abs(C));
+    // Random sampling of factor pairs
+    let tries = 0;
+    while (choices.length < targetCount && tries++ < 400) {
+      const f = Fs[Math.floor(Math.random() * Fs.length)];
+      const l = Ls[Math.floor(Math.random() * Ls.length)];
+      const signConst = Math.random() < 0.5 ? 1 : -1; // random sign on constants
+
+      const U = f;
+      const W = A / f;
+      const V = signConst * l;
+      const Z = C / V; // guaranteed integer since l| |C|
+      if (!Number.isInteger(Z)) continue;
+      if (isCorrectFactorization(U, V, W, Z, A, B, C)) continue;
+      addChoice(U, V, W, Z);
+    }
+  }
+
+  // Seed with product-preserving wrong answers first
+  addWrongByProducts(5);
+
+  // Fallback padding: gentle tweaks if we still lack variety
+  while (choices.length < 5) {
     const dv = ri(-1, 1), dz = ri(-1, 1);
     addChoice(u, v + dv, w, z + dz);
   }
