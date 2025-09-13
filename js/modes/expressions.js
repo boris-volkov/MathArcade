@@ -168,4 +168,4 @@ generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp   = () => { level++; console.log('[Level]', level); };
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log('[Level]', level); };
 
-export default { generateQuestion, timing: { baseMs: 8000 } };
+export default { generateQuestion, timing: { baseMs: 9000 } };
