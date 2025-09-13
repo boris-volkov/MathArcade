@@ -83,12 +83,12 @@ const FNS_BASIC = FNS_ALL.slice(0, 3);
 let useAllFns = false;
 
 const FN_LATEX = {
-  arcsin: "\\arcsin",
-  arccos: "\\arccos",
-  arctan: "\\arctan",
-  arcsec: "\\arcsec",
-  arccsc: "\\arccsc",
-  arccot: "\\arccot",
+  arcsin: "\\sin^{-1}",
+  arccos: "\\cos^{-1}",
+  arctan: "\\tan^{-1}",
+  arcsec: "\\sec^{-1}",
+  arccsc: "\\csc^{-1}",
+  arccot: "\\cot^{-1}",
 };
 
 function generateQuestion() {
