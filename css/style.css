@@ -290,10 +290,12 @@ h1 {
 }
 
 #answerGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(90px, 1fr));
+  /* Use flex so incomplete rows center nicely */
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.6rem;
-  margin: 0 4vw;
+  justify-content: center;
+  margin: 0 auto;
   width: 100%;
   max-width: 420px;
 }
@@ -307,6 +309,11 @@ h1 {
   padding: 0.6rem 0.4rem;
   user-select: none;
   transition: background 0.15s ease;
+  /* Flex sizing: aim for ~3 per row, but wrap on small screens */
+  flex: 1 1 120px;
+  min-width: 90px;
+  max-width: 130px;
+  text-align: center;
 }
 
 #answerGrid button.active {
