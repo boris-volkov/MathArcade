@@ -309,10 +309,9 @@ h1 {
   padding: 0.6rem 0.4rem;
   user-select: none;
   transition: background 0.15s ease;
-  /* Flex sizing: aim for ~3 per row, but wrap on small screens */
-  flex: 1 1 120px;
-  min-width: 90px;
-  max-width: 130px;
+  /* Force three columns while allowing wrap; center incomplete rows */
+  box-sizing: border-box;
+  flex: 0 0 calc((100% - 1.2rem) / 3); /* 2 gaps of 0.6rem per row */
   text-align: center;
 }
 
