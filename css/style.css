@@ -14,13 +14,17 @@ body {
 body.factoring #answerGrid {
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
   gap: 0.6rem;
   width: 100%;
   max-width: 500px;
+  margin: 0 auto;
+  align-items: stretch;
   /* a bit wider since expressions are long */
 }
 
 body.factoring #answerGrid button {
+  flex: 1 1 auto;
   width: 100%;
   text-align: center;
 }
