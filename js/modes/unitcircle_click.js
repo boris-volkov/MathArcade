@@ -51,4 +51,4 @@ generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp   = () => { level++; console.log('[UnitCircle Click Level]', level); };
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log('[UnitCircle Click Level]', level); };
 
-export default { generateQuestion };
+export default { generateQuestion, uiType: "circle" };

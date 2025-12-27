@@ -12,13 +12,14 @@
 
 <body>
   <div id="question"></div>
-<div class="answer-group">
-  <input id="answer" type="text" inputmode="numeric" readonly />
-  <button id="clearBtn" class="btn-clear-inline" aria-label="Clear answer">C</button>
-</div>
 
-  <!-- Numpad styled like calculator -->
-  <div class="numpad">
+  <!-- Numpad UI -->
+  <div class="answer-group" id="numpad-ui" style="display: none;">
+    <input id="answer" type="text" inputmode="numeric" readonly />
+    <button id="clearBtn" class="btn-clear-inline" aria-label="Clear answer">C</button>
+  </div>
+
+  <div class="numpad" id="numpad" style="display: none;">
     <button data-digit="1">1</button>
     <button data-digit="2">2</button>
     <button data-digit="3">3</button>
@@ -31,14 +32,30 @@
     <button data-digit="8">8</button>
     <button data-digit="9">9</button>
 
-    <button data-action="neg" class="btn-neg">±</button> <!-- NEW -->
+    <button data-action="neg" class="btn-neg">±</button>
     <button data-digit="0">0</button>
     <button data-action="enter" class="btn-enter">-></button>
   </div>
 
+  <!-- Choice UI -->
+  <div id="choice-ui" style="display: none;">
+    <div id="answerGrid">
+      <button id="negToggle" title="Toggle negative">−</button>
+      <!-- Answer buttons will be injected -->
+    </div>
+  </div>
+
+  <!-- Circle UI -->
+  <div id="circle-ui" style="display: none;">
+    <div id="circleMount"></div>
+  </div>
+
   <div id="feedback"></div>
-  <!-- Small level indicator at the bottom -->
-  <div id="levelIndicator" class="level-indicator" aria-live="polite"></div>
+  <!-- Progress bar for leveled games -->
+  <div id="progressBar" class="progress-bar" style="display: none;">
+    <div id="progressFill" class="progress-fill"></div>
+    <div id="progressText" class="progress-text"></div>
+  </div>
   <!-- Stats for non-level modes (algebra/trig) -->
   <div id="stats"></div>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>

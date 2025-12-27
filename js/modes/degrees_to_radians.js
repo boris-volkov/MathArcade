@@ -80,4 +80,5 @@ generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log(
 export default {
   dynamicChoices: true,
   generateQuestion,
+  uiType: "choice",
 };

@@ -111,4 +111,5 @@ export default {
   enableNegToggle: true,
   generateQuestion,
   isCorrect(user, correct) { return user === correct; },
+  uiType: "choice",
 };

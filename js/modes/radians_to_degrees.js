@@ -63,4 +63,4 @@ generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp   = () => { level++; console.log("[Level]", level); };
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log("[Level]", level); };
 
-export default { generateQuestion };
+export default { generateQuestion, uiType: "numpad" };

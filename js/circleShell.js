@@ -8,6 +8,12 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
 
   const $ = (s, r = document) => r.querySelector(s);
 
+  // Show circle UI
+  $('#circle-ui').style.display = '';
+  $('#numpad-ui').style.display = 'none';
+  $('#numpad').style.display = 'none';
+  $('#choice-ui').style.display = 'none';
+
   const mount = $("#circleMount");
   const qEl = $("#question");
   const feedbackEl = $("#feedback");

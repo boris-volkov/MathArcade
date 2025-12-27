@@ -15,6 +15,12 @@ export function setupGame(config) {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  // Show numpad UI
+  $('#numpad-ui').style.display = '';
+  $('#numpad').style.display = '';
+  $('#choice-ui').style.display = 'none';
+  $('#circle-ui').style.display = 'none';
+
   // Detect mode from URL to decide which UI to show
   const params = new URLSearchParams(location.search);
   const mode = (params.get('mode') || 'multiplication').toLowerCase();
@@ -32,6 +38,9 @@ export function setupGame(config) {
   const answerEl = $("#answer");
   const feedbackEl = $("#feedback");
   const levelEl = $("#levelIndicator");
+  const progressBarEl = $("#progressBar");
+  const progressFillEl = $("#progressFill");
+  const progressTextEl = $("#progressText");
   const statsEl = $("#stats");
   const buttons = $$(".numpad button");
   const clearBtn = document.querySelector("#clearBtn");
@@ -141,7 +150,8 @@ if (clearBtn) {
     return t;
   }
   const EMA_ALPHA = 0.35;    // weight of the latest dt in EMA
-  const PROGRESS_GAIN = 0.6; // max progress magnitude per answer
+  const PROGRESS_GAIN = 0.2; // max speed bonus per answer (1/5 level)
+  const BASE_PROGRESS = 0.1; // base progress per correct answer (1/10 level)
   const START_MIN_TOTAL = 6; // wait for a few answers before adapting
   const COOLDOWN_Q = 2;      // min questions between level changes
 
@@ -152,23 +162,27 @@ if (clearBtn) {
   let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
 
   function updateLevelIndicator() {
-    if (!levelEl) return;
+    if (!progressBarEl || !progressFillEl || !progressTextEl) return;
     // Toggle visibility based on mode
-    levelEl.style.display = showLevelUI ? '' : 'none';
-    if (!showLevelUI) return; // don't populate when hidden
+    const show = showLevelUI;
+    progressBarEl.style.display = show ? '' : 'none';
+    if (!show) return; // don't populate when hidden
     try {
       const hasFn = typeof generateQuestion.getLevel === "function";
       if (hasFn) {
         const lvl = generateQuestion.getLevel();
         if (Number.isFinite(lvl)) {
-          levelEl.textContent = `Level: ${lvl}`;
+          progressTextEl.textContent = `Level ${lvl}`;
+          progressFillEl.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
           return;
         }
       }
       // If not applicable, show nothing
-      levelEl.textContent = "";
+      progressTextEl.textContent = "";
+      progressFillEl.style.width = "0%";
     } catch {
-      levelEl.textContent = "";
+      progressTextEl.textContent = "";
+      progressFillEl.style.width = "0%";
     }
   }
 
@@ -250,29 +264,27 @@ if (clearBtn) {
         totalAnswered++;
         emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
 
+        // Always add base progress for correct answers
+        progress += BASE_PROGRESS;
+
         if (totalAnswered >= START_MIN_TOTAL) {
           const TARGET_MS = getTargetMs();
-          let inc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
-          if (inc > PROGRESS_GAIN) inc = PROGRESS_GAIN;
-          if (inc < -PROGRESS_GAIN) inc = -PROGRESS_GAIN;
-          progress += inc;
+          let timeInc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
+          // Cap bonuses at PROGRESS_GAIN (1/5 level) and penalties at half base
+          timeInc = Math.max(-BASE_PROGRESS * 0.5, Math.min(PROGRESS_GAIN, timeInc));
+          progress += timeInc;
 
-          // Enforce question-count cooldown between level changes
-          const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
+          console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} base=${BASE_PROGRESS.toFixed(2)} time=${timeInc.toFixed(2)} prog=${progress.toFixed(2)}`);
+        }
 
-          if (progress >= 1 && canChange) {
-            generateQuestion.bumpUp();
-            updateLevelIndicator();
-            progress -= 1;
-            lastChangeAtTotal = totalAnswered;
-          } else if (progress <= -1 && canChange) {
-            generateQuestion.bumpDown();
-            updateLevelIndicator();
-            progress += 1;
-            lastChangeAtTotal = totalAnswered;
-          }
+        // Enforce question-count cooldown between level changes
+        const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
 
-          console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} inc=${inc.toFixed(2)} prog=${progress.toFixed(2)}`);
+        if (progress >= 1 && canChange) {
+          generateQuestion.bumpUp();
+          updateLevelIndicator();
+          progress -= 1;
+          lastChangeAtTotal = totalAnswered;
         }
       }
 

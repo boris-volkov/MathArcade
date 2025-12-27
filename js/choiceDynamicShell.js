@@ -12,10 +12,23 @@ export function setupDynamicChoiceGame({
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  // Show choice UI
+  $('#choice-ui').style.display = '';
+  $('#numpad-ui').style.display = 'none';
+  $('#numpad').style.display = 'none';
+  $('#circle-ui').style.display = 'none';
+
   const qEl        = $("#question");
   const grid       = $("#answerGrid");
   const feedbackEl = $("#feedback");
   const statsEl    = $("#stats");
+
+  // Add class for column layout only for factoring
+  const params = new URLSearchParams(location.search);
+  const mode = params.get("mode") || "multiplication";
+  if (mode === "factoring") {
+    grid.classList.add("dynamic-choices");
+  }
 
   let correct = 0, total = 0, start = performance.now();
   let currentCorrectIndex = -1;

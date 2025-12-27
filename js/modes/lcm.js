@@ -52,5 +52,4 @@ generateQuestion.getLevel  = () => level;
 generateQuestion.bumpUp    = () => { level++; console.log("[LCM Level] →", level); };
 generateQuestion.bumpDown  = () => { level = Math.max(1, level - 1); console.log("[LCM Level] →", level); };
 
-export default { generateQuestion };
-
+export default { generateQuestion, uiType: "numpad" };

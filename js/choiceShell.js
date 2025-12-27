@@ -21,6 +21,12 @@ export function setupChoiceGame({
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  // Show choice UI
+  $('#choice-ui').style.display = '';
+  $('#numpad-ui').style.display = 'none';
+  $('#numpad').style.display = 'none';
+  $('#circle-ui').style.display = 'none';
+
   const qEl = $("#question");
   const grid = $("#answerGrid");
   const feedbackEl = $("#feedback");
