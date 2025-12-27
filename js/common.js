@@ -178,6 +178,8 @@ if (clearBtn) {
           progressTextEl.textContent = `Level ${lvl}`;
           const widthPercent = Math.max(0, Math.min(100, progress * 100));
           progressFillEl.style.width = `${widthPercent}%`;
+          // Force repaint for iOS Safari
+          progressFillEl.offsetHeight;
           console.log(`[Progress] Level ${lvl}, progress ${progress.toFixed(2)}, width ${widthPercent}%`);
           return;
         }
