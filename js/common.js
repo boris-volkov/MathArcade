@@ -162,7 +162,10 @@ if (clearBtn) {
   let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
 
   function updateLevelIndicator() {
-    if (!progressBarEl || !progressFillEl || !progressTextEl) return;
+    if (!progressBarEl || !progressFillEl || !progressTextEl) {
+      console.log("[Progress] Elements not found:", { progressBarEl, progressFillEl, progressTextEl });
+      return;
+    }
     // Toggle visibility based on mode
     const show = showLevelUI;
     progressBarEl.style.display = show ? '' : 'none';
@@ -173,14 +176,17 @@ if (clearBtn) {
         const lvl = generateQuestion.getLevel();
         if (Number.isFinite(lvl)) {
           progressTextEl.textContent = `Level ${lvl}`;
-          progressFillEl.style.width = `${Math.max(0, Math.min(100, progress * 100))}%`;
+          const widthPercent = Math.max(0, Math.min(100, progress * 100));
+          progressFillEl.style.width = `${widthPercent}%`;
+          console.log(`[Progress] Level ${lvl}, progress ${progress.toFixed(2)}, width ${widthPercent}%`);
           return;
         }
       }
       // If not applicable, show nothing
       progressTextEl.textContent = "";
       progressFillEl.style.width = "0%";
-    } catch {
+    } catch (err) {
+      console.error("[Progress] Error:", err);
       progressTextEl.textContent = "";
       progressFillEl.style.width = "0%";
     }
