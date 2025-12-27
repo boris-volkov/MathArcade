@@ -383,7 +383,7 @@ h1 {
   height: 100%;
   background: linear-gradient(#009dff);
   width: 0%;
-  transition: width 0.3s ease;
+  /* Removed transition for iOS Safari compatibility */
 }
 
 .progress-text {
