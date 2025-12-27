@@ -18,7 +18,7 @@ body.factoring #answerGrid {
   gap: 0.6rem;
   width: 100%;
   max-width: 500px;
-  margin: 0 auto;
+  margin: 1rem auto;
   align-items: stretch;
   /* a bit wider since expressions are long */
 }
@@ -27,6 +27,7 @@ body.factoring #answerGrid button {
   flex: 1 1 auto;
   width: 100%;
   text-align: center;
+  padding: 1rem 0.8rem;
 }
 
 h1 {
@@ -296,7 +297,7 @@ h1 {
   flex-wrap: wrap;
   gap: 0.6rem;
   justify-content: center;
-  margin: 0 auto;
+  margin: 1rem auto;
   width: 100%;
   max-width: 420px;
 }
@@ -307,7 +308,7 @@ h1 {
   border: 1px solid #1e2222;
   background: #262424;
   color: #e9e2e2;
-  padding: 0.6rem 0.4rem;
+  padding: 1rem 0.8rem;
   user-select: none;
   transition: background 0.15s ease;
   /* Force three columns while allowing wrap; center incomplete rows */
@@ -332,7 +333,7 @@ h1 {
   gap: 0.6rem !important;
   width: 100% !important;
   max-width: 500px !important;
-  margin: 0 auto !important;
+  margin: 1rem auto !important;
   align-items: stretch !important;
   justify-content: center !important; /* reset */
 }
@@ -341,6 +342,7 @@ h1 {
   flex: 0 0 auto !important; /* reset from calc */
   width: 100% !important;
   text-align: center !important;
+  padding: 1rem 0.8rem !important;
 }
 
 #negToggle {
