@@ -15,11 +15,16 @@ export function setupGame(config) {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
+  const numpadUiEl = $('#numpad-ui');
+  const numpadEl = $('#numpad');
+  const choiceUiEl = $('#choice-ui');
+  const circleUiEl = $('#circle-ui');
+
   // Show numpad UI
-  $('#numpad-ui').style.display = '';
-  $('#numpad').style.display = '';
-  $('#choice-ui').style.display = 'none';
-  $('#circle-ui').style.display = 'none';
+  numpadUiEl.style.display = '';
+  numpadEl.style.display = '';
+  choiceUiEl.style.display = 'none';
+  circleUiEl.style.display = 'none';
 
   // Detect mode from URL to decide which UI to show
   const params = new URLSearchParams(location.search);
@@ -57,6 +62,12 @@ if (clearBtn) {
   const sessionStartAt = performance.now();
   let correctCount = 0;
   let totalCount = 0;
+  let awaitingNext = false;
+  let nextTimer = null;
+
+  function setAwaitingNext(value) {
+    awaitingNext = value;
+  }
 
   function getQuestionKey(q) {
     if (q && typeof q.key === "string" && q.key.length) return q.key;
@@ -76,6 +87,12 @@ if (clearBtn) {
   }
 
   function newQuestion() {
+    // Allow input for the new question; also clear any queued transition
+    setAwaitingNext(false);
+    if (nextTimer) {
+      clearTimeout(nextTimer);
+      nextTimer = null;
+    }
     // Avoid showing the exact same question twice in a row
     let q = generateQuestion();
     let key = getQuestionKey(q);
@@ -250,10 +267,12 @@ if (clearBtn) {
 
   // New time-based leveling checkAnswer (smoothed)
   function checkAnswer() {
+    if (awaitingNext || currentAnswer == null) return;
     const guess = parseInt(answerEl.value, 10);
     if (!Number.isFinite(guess)) return;
 
     if (guess === currentAnswer) {
+      setAwaitingNext(true);
       // Visual-only success flash; no text
       feedbackEl.textContent = "";
       answerEl.classList.add("correct");
@@ -296,7 +315,11 @@ if (clearBtn) {
         }
       }
 
-      setTimeout(newQuestion, nextDelayMs);
+      if (nextTimer) clearTimeout(nextTimer);
+      nextTimer = setTimeout(() => {
+        nextTimer = null;
+        newQuestion();
+      }, nextDelayMs);
     } else {
       // Visual-only error flash; no text
       feedbackEl.textContent = "";
@@ -311,6 +334,7 @@ if (clearBtn) {
   }
   // Shared action handler (used by both pointer and keyboard)
 function handlePress({ digit = null, action = null }) {
+  if (awaitingNext) return;
   if (digit !== null) {
     answerEl.value = (answerEl.value === "0") ? digit : (answerEl.value + digit);
   } else if (action === "clear") {
@@ -333,6 +357,7 @@ function handlePress({ digit = null, action = null }) {
   buttons.forEach(btn => {
     btn.addEventListener("pointerdown", (e) => {
       e.preventDefault(); // avoid ghost clicks
+      if (awaitingNext) return;
       flash(btn);
       const d = btn.dataset.digit;
       const action = btn.dataset.action;
@@ -345,6 +370,7 @@ function handlePress({ digit = null, action = null }) {
 
   // Keyboard: call the same handler (no .click())
   document.addEventListener("keydown", (e) => {
+    if (awaitingNext) return;
     const k = e.key;
 
     if (/^\d$/.test(k)) {
