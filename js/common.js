@@ -169,6 +169,7 @@ if (clearBtn) {
   const EMA_ALPHA = 0.35;    // weight of the latest dt in EMA
   const PROGRESS_GAIN = 0.2; // max speed bonus per answer (1/5 level)
   const BASE_PROGRESS = 0.1; // base progress per correct answer (1/10 level)
+  const WRONG_GUESS_PENALTY = 0.125; // remove 1/8 level progress per wrong guess
   const START_MIN_TOTAL = 6; // wait for a few answers before adapting
   const COOLDOWN_Q = 2;      // min questions between level changes
 
@@ -177,6 +178,39 @@ if (clearBtn) {
   let emaDt = null;          // exponential moving average of dt
   let progress = 0;          // fractional progress toward next level change
   let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
+
+  function applyWrongGuessPenalty() {
+    // No leveling API available: nothing to penalize beyond visual stats.
+    if (typeof generateQuestion.bumpUp !== "function") return;
+
+    let remaining = WRONG_GUESS_PENALTY;
+    while (remaining > 0) {
+      if (progress >= remaining) {
+        progress -= remaining;
+        break;
+      }
+
+      const deficit = remaining - progress;
+      const lvl = (typeof generateQuestion.getLevel === "function")
+        ? Number(generateQuestion.getLevel())
+        : 1;
+      const canBumpDown = typeof generateQuestion.bumpDown === "function" && Number.isFinite(lvl) && lvl > 1;
+
+      if (!canBumpDown) {
+        // Floor: level 1 at zero progress.
+        progress = 0;
+        break;
+      }
+
+      generateQuestion.bumpDown();
+      // After dropping a level, continue consuming the leftover penalty
+      // from a full level bar.
+      progress = 1;
+      remaining = deficit;
+    }
+
+    updateLevelIndicator();
+  }
 
   function updateLevelIndicator() {
     if (!progressBarEl || !progressFillEl || !progressTextEl) {
@@ -321,6 +355,7 @@ if (clearBtn) {
         newQuestion();
       }, nextDelayMs);
     } else {
+      applyWrongGuessPenalty();
       // Visual-only error flash; no text
       feedbackEl.textContent = "";
       // Clear previous attempt on wrong answer

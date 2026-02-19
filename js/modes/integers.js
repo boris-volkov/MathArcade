@@ -11,15 +11,18 @@ function ri(min, max) { // inclusive
 
 function generateQuestion() {
   const max = maxFromLevel(level);
-  // Pick symmetric integers in [-max, max], avoid the trivial 0 +/- 0
-  let a = ri(-max, max);
-  let b = ri(-max, max);
-  if (a === 0 && b === 0) {
-    // nudge one value away from 0 to keep it meaningful
-    a = 1;
-  }
+  // Pick symmetric integers in [-max, max], avoid trivial/undesired patterns.
+  // Specifically skip plain positive addition prompts like "3 + 8".
+  let a = 0;
+  let b = 0;
+  let op = "+";
+  do {
+    a = ri(-max, max);
+    b = ri(-max, max);
+    op = Math.random() < 0.5 ? "+" : "-";
+    if (a === 0 && b === 0) a = 1; // nudge away from 0 +/- 0
+  } while (op === "+" && a > 0 && b > 0);
 
-  const op = Math.random() < 0.5 ? "+" : "-";
   const text = `${a} ${op} ${b}`;
   const answer = (op === "+") ? a + b : a - b;
 
