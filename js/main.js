@@ -9,6 +9,7 @@ const MODE_PATHS = {
   expressions: "./modes/expressions.js",
   subtraction: "./modes/subtraction.js",
   division: "./modes/division.js",
+  percents: "./modes/percents.js",
   radians_to_degrees: "./modes/radians_to_degrees.js",
   logic: "./modes/logic.js",
   lcm: "./modes/lcm.js",
@@ -22,6 +23,34 @@ const MODE_PATHS = {
   unitcircle_click: "./modes/unitcircle_click.js",
 };
 
+const MODE_TITLES = {
+  addition: "Addition",
+  subtraction: "Subtraction",
+  integers: "Integers",
+  multiplication: "Multiplication",
+  division: "Division",
+  percents: "Percents",
+  expressions: "Expressions",
+  lcm: "LCM",
+  gcf: "GCF",
+  factoring: "Factoring",
+  logarithms: "Logarithms",
+  logic: "Boolean Expressions",
+  unitcircle: "Unit Circle Functions",
+  unitcircle_click: "Unit Circle",
+  inverse_trig: "Inverse Trig",
+  radians_to_degrees: "Radians to Degrees",
+  degrees_to_radians: "Degrees to Radians",
+};
+
+function modeToTitle(modeKey) {
+  if (MODE_TITLES[modeKey]) return MODE_TITLES[modeKey];
+  return modeKey
+    .split("_")
+    .map(w => w ? (w[0].toUpperCase() + w.slice(1)) : w)
+    .join(" ");
+}
+
 async function boot() {
   try {
     const modPath = MODE_PATHS[mode];
@@ -31,6 +60,8 @@ async function boot() {
     if (!mod || !mod.default) throw new Error(`Mode "${mode}" missing default export`);
 
     const cfg = mod.default;
+    const gameTitle = cfg.title || modeToTitle(mode);
+    document.title = `${gameTitle} | Math Arcade`;
     const uiType = cfg.uiType || 'numpad';
 
     if (uiType === 'numpad') {

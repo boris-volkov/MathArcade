@@ -30,7 +30,7 @@ export function setupGame(config) {
   const params = new URLSearchParams(location.search);
   const mode = (params.get('mode') || 'multiplication').toLowerCase();
   const SHOW_LEVEL_FOR = new Set([
-    'addition', 'subtraction', 'multiplication', 'division', 'lcm', 'gcf', 'integers',
+    'addition', 'subtraction', 'multiplication', 'division', 'percents', 'lcm', 'gcf', 'integers',
     // include boolean expressions mode
     'logic',
     // show level for arithmetic expressions as well
