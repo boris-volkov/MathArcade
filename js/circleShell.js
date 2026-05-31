@@ -8,6 +8,21 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
 
   const $ = (s, r = document) => r.querySelector(s);
 
+  // Read colors from CSS variables so they have a single source of truth in style.css
+  const cssVars = getComputedStyle(document.documentElement);
+  const C = {
+    ring:           cssVars.getPropertyValue("--ring-stroke").trim(),
+    dotGreenFill:   cssVars.getPropertyValue("--dot-green-fill").trim(),
+    dotBlueFill:    cssVars.getPropertyValue("--dot-blue-fill").trim(),
+    dotRedFill:     cssVars.getPropertyValue("--dot-red-fill").trim(),
+    rayGreen:       cssVars.getPropertyValue("--ray-green").trim(),
+    rayBlue:        cssVars.getPropertyValue("--ray-blue").trim(),
+    rayRed:         cssVars.getPropertyValue("--ray-red").trim(),
+    rayGreenBright: cssVars.getPropertyValue("--ray-green-bright").trim(),
+    rayBlueBright:  cssVars.getPropertyValue("--ray-blue-bright").trim(),
+    rayRedBright:   cssVars.getPropertyValue("--ray-red-bright").trim(),
+  };
+
   // Show circle UI
   $('#circle-ui').style.display = '';
   $('#numpad-ui').style.display = 'none';
@@ -39,10 +54,10 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   ring.setAttribute("cy", String(cy));
   ring.setAttribute("r", String(r));
   ring.setAttribute("fill", "none");
-  ring.setAttribute("stroke", "#635c5c");
+  ring.setAttribute("stroke", C.ring);
   ring.setAttribute("stroke-width", "2");
   // store base stroke styling for flash restore
-  ring.dataset.baseStroke = "#635c5c";
+  ring.dataset.baseStroke = C.ring;
   ring.dataset.baseStrokeOpacity = ring.getAttribute("stroke-opacity") || "1";
   ring.dataset.baseStrokeWidth = "2";
   svg.appendChild(ring);
@@ -61,7 +76,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     line.setAttribute("y1", String(cy));
     line.setAttribute("x2", String(x));
     line.setAttribute("y2", String(y));
-    const stroke = isQuadrantal ? "#4caf50" : "#5a80a3";
+    const stroke = isQuadrantal ? C.rayGreen : C.rayBlue;
     const baseOpacity = isQuadrantal ? "0.28" : "0.18";
     const baseWidth = "2";
     line.setAttribute("stroke", stroke);
@@ -91,8 +106,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     // Color scheme: multiples of 90° (k%3==0) green; others (30° multiples) blue.
     // Note: 45° multiples not on 12-point grid except quadrantal; we reserve red for future overlay.
     const isQuadrantal = (k % 3) === 0;
-    const fill = isQuadrantal ? "#1e5a1e" : "#262e3a";       // deep green vs deep blue-gray
-    const stroke = isQuadrantal ? "#4caf50" : "#5a80a3";     // green vs blue
+    const fill = isQuadrantal ? C.dotGreenFill : C.dotBlueFill;  // deep green vs deep blue-gray
+    const stroke = isQuadrantal ? C.rayGreen : C.rayBlue;        // green vs blue
     c.setAttribute("fill", fill);
     // Make dots fully opaque by default
     c.setAttribute("fill-opacity", "1");
@@ -121,8 +136,8 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     c.setAttribute("cx", String(x));
     c.setAttribute("cy", String(y));
     c.setAttribute("r", String(9));
-    c.setAttribute("fill", "#3a2626");
-    c.setAttribute("stroke", "#b74e4e");
+    c.setAttribute("fill", C.dotRedFill);
+    c.setAttribute("stroke", C.rayRed);
     c.setAttribute("stroke-width", "2");
     // Make this legacy overlay invisible to avoid double borders; kept for compatibility
     c.setAttribute("stroke-opacity", "0");
@@ -143,7 +158,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     ray.setAttribute("y1", String(cy));
     ray.setAttribute("x2", String(x));
     ray.setAttribute("y2", String(y));
-    ray.setAttribute("stroke", "#b74e4e");
+    ray.setAttribute("stroke", C.rayRed);
     const baseOpacityR = "0.22";
     const baseWidthR = "2";
     ray.setAttribute("stroke-opacity", baseOpacityR);
@@ -154,6 +169,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     ray.dataset.m24 = String(m24r);
     ray.dataset.baseOpacity = baseOpacityR;
     ray.dataset.baseWidth = baseWidthR;
+    ray.dataset.baseStroke = C.rayRed;
     raysByM24.set(m24r, ray);
     svg.appendChild(ray);
 
@@ -162,13 +178,13 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     dot.setAttribute("cx", String(x));
     dot.setAttribute("cy", String(y));
     dot.setAttribute("r", String(11));
-    dot.setAttribute("fill", "#3a2626");
+    dot.setAttribute("fill", C.dotRedFill);
     dot.setAttribute("fill-opacity", "1");
     dot.dataset.baseFillOpacity = "1";
-    dot.dataset.baseFill = "#3a2626";
-    dot.setAttribute("stroke", "#b74e4e");
+    dot.dataset.baseFill = C.dotRedFill;
+    dot.setAttribute("stroke", C.rayRed);
     dot.setAttribute("stroke-width", "2");
-    dot.dataset.baseStroke = "#b74e4e";
+    dot.dataset.baseStroke = C.rayRed;
     dot.dataset.baseStrokeOpacity = "1";
     dot.dataset.baseStrokeWidth = "2";
     dot.style.cursor = "pointer";
@@ -233,12 +249,10 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
 
   function brightenStroke(hex) {
     const h = (hex || "").toLowerCase();
-    switch (h) {
-      case "#4caf50": return "#81c784"; // green lighten
-      case "#5a80a3": return "#90caf9"; // blue lighten
-      case "#b74e4e": return "#ef9a9a"; // red lighten
-      default: return h || "#ffffff";
-    }
+    if (h === C.rayGreen.toLowerCase()) return C.rayGreenBright;
+    if (h === C.rayBlue.toLowerCase())  return C.rayBlueBright;
+    if (h === C.rayRed.toLowerCase())   return C.rayRedBright;
+    return h || "#ffffff";
   }
 
   function highlightDot(dotEl) {
@@ -290,12 +304,12 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     // Flash the outer ring red briefly, and tint the dot
     const baseStroke = ring.dataset.baseStroke || ring.getAttribute("stroke") || "#635c5c";
     const baseOp = ring.dataset.baseStrokeOpacity || ring.getAttribute("stroke-opacity") || "1";
-    ring.setAttribute("stroke", "#b74e4e");
+    ring.setAttribute("stroke", C.rayRed);
     ring.setAttribute("stroke-opacity", "1");
     if (dotEl) {
-      dotEl.setAttribute("fill", "#b74e4e");
+      dotEl.setAttribute("fill", C.rayRed);
       dotEl.setAttribute("fill-opacity", "1");
-      dotEl.setAttribute("stroke", "#ef9a9a");
+      dotEl.setAttribute("stroke", C.rayRedBright);
       dotEl.setAttribute("stroke-opacity", "1");
     }
     setTimeout(() => {

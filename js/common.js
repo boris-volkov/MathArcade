@@ -1,8 +1,7 @@
+import { gcd, lcm } from "./utils.js";
+
 // Helpers available to modes
-export const math = {
-  gcd(a, b) { return b === 0 ? Math.abs(a) : math.gcd(b, a % b); },
-  lcm(a, b) { return Math.abs(a * b) / math.gcd(a, b); },
-};
+export const math = { gcd, lcm };
 
 // Shared game wiring; takes a mode config
 // { title?, generateQuestion, nextDelayMs?, flashMs?,

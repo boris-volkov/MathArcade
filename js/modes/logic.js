@@ -1,6 +1,6 @@
-let level = 1;
+import { ri } from "../utils.js";
 
-function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+let level = 1;
 
 function lit() { return { kind: 'lit', v: Math.random() < 0.5 ? 0 : 1 }; }
 function not(node) { return { kind: 'not', node }; }

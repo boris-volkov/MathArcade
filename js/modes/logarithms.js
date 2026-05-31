@@ -1,18 +1,11 @@
+import { ri, simplifyFrac } from "../utils.js";
+
 let level = 1;
 
 // Integer ranges that scale with level (for classic integer exponents)
 function maxBase(lv) { return Math.min(3 + lv, 9); }
 function maxPosExp(lv)  { return Math.min(2 + lv, 6); }
 function maxNegExp(lv)  { return Math.min(1 + Math.floor(lv / 2), 3); }
-
-function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-function frac(n, d) { return { n, d }; }
-function simplifyFrac({ n, d }) {
-  const g = (a,b)=> b===0?Math.abs(a):g(b,a%b);
-  const g0 = g(Math.abs(n), Math.abs(d));
-  return { n: n/g0, d: d/g0 };
-}
 
 function rootLatex(base, q) {
   return q === 2 ? `\\sqrt{${base}}` : `\\sqrt[${q}]{${base}}`;
@@ -54,7 +47,7 @@ function fracExpVariant() {
   const b = ri(2, Math.max(4, maxBase(level))); // small base
   const q = ri(2, Math.min(4, 2 + Math.floor(level/2))); // root index 2..4
   const p = ri(1, Math.min(5, 1 + level));               // small numerator
-  const F = simplifyFrac(frac(p, q));
+  const F = simplifyFrac(p, q);
 
   const hide = 'b'; // ensure integer answer only
 
@@ -83,7 +76,7 @@ function fracExpHideAVariant() {
   const q = ri(2, Math.min(4, 2 + Math.floor(level/2))); // root index
   const t = ri(2, Math.min(7, 3 + level));               // base root (kept small)
   const p = ri(1, Math.min(5, 1 + Math.floor(level/2))); // numerator
-  const F = simplifyFrac(frac(p, q));
+  const F = simplifyFrac(p, q);
 
   const b = Math.pow(t, q);   // perfect q-th power (e.g., 9)
   const a = Math.pow(t, p);   // integer (e.g., 3)

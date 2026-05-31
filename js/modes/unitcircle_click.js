@@ -1,14 +1,10 @@
+import { simplifyFrac } from "../utils.js";
+
 let level = 1;
 
 // Union of 12-point (30°) grid and 45° points.
 // We index positions by m in [0..23] with angle = 2π m / 24.
 // Allowed positions: m % 2 === 0 (all 30° multiples) OR m % 3 === 0 (all 45° multiples).
-
-function simplifyFrac(n, d) {
-  const g = (a,b)=> b===0?Math.abs(a):g(b,a%b);
-  const gg = g(Math.abs(n), Math.abs(d));
-  return { n: n/gg, d: d/gg };
-}
 
 function angleLatexFromNumerator(n) {
   if (n === 0) return "0";

@@ -21,6 +21,7 @@ const MODE_PATHS = {
   inverse_trig: "./modes/inverse_trig.js",
   degrees_to_radians: "./modes/degrees_to_radians.js",
   unitcircle_click: "./modes/unitcircle_click.js",
+  mixed_trig: "./modes/mixed_trig.js",
 };
 
 const MODE_TITLES = {
@@ -41,6 +42,7 @@ const MODE_TITLES = {
   inverse_trig: "Inverse Trig",
   radians_to_degrees: "Radians to Degrees",
   degrees_to_radians: "Degrees to Radians",
+  mixed_trig: "Mixed Trig Practice",
 };
 
 function modeToTitle(modeKey) {

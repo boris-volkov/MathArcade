@@ -1,4 +1,5 @@
 import { math } from "../common.js";
+import { ri } from "../utils.js";
 
 let level = 1;
 
@@ -11,22 +12,18 @@ function maxFromLevel(lv) {
   return Math.min(300, 60 + lv * 20);
 }
 
-function randInt(lo, hi) { // inclusive
-  return Math.floor(Math.random() * (hi - lo + 1)) + lo;
-}
-
 // Build a product of small primes to create numbers with richer prime factors
 function productOfSmallPrimes(max) {
   const primes = [2, 3, 5, 7, 11, 13];
-  const picks = randInt(2, 3); // choose 2–3 primes
+  const picks = ri(2, 3); // choose 2–3 primes
   let n = 1;
   for (let i = 0; i < picks; i++) {
-    const p = primes[randInt(0, Math.min(primes.length - 1, 4 + (level > 10 ? 2 : 0)))];
+    const p = primes[ri(0, Math.min(primes.length - 1, 4 + (level > 10 ? 2 : 0)))];
     if (n * p > max) break;
     n *= p;
   }
   // If we failed to build a product > 1, fall back to a random integer
-  if (n <= 1) n = randInt(2, Math.max(2, max));
+  if (n <= 1) n = ri(2, Math.max(2, max));
   return n;
 }
 
@@ -40,7 +37,7 @@ function generateQuestion() {
   const nums = [];
   for (let i = 0; i < count; i++) {
     if (Math.random() < BIAS_PRIMEY) nums.push(productOfSmallPrimes(max));
-    else nums.push(randInt(2, max));
+    else nums.push(ri(2, max));
   }
 
   const text = `LCM(${nums.join(", ")})`;

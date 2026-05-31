@@ -1,12 +1,10 @@
+import { ri } from "../utils.js";
+
 let level = 1;
 
 function maxFromLevel(lv) {
   // Start at 10, then +5 per level
   return 10 + (Math.max(1, lv) - 1) * 5;
-}
-
-function ri(min, max) { // inclusive
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function generateQuestion() {

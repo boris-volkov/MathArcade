@@ -2,12 +2,12 @@
 // Generates a primitive quadratic Ax^2 + Bx + C (gcd(A,B,C)=1) that factors
 // uniquely into two primitive binomials (ux+v)(wx+z). No scalar factor.
 
+import { gcd, ri } from "../utils.js";
+
 let level = 1; // kept for shell compatibility (not used for difficulty here)
 
 // ---------- helpers ----------
-function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
 function coprime(a, b) { return gcd(a, b) === 1; }
-function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 function nz(min, max) { let v; do { v = ri(min, max); } while (v === 0); return v; }
 
 // Primitive binomial (p x + q) where p≠0 and gcd(p,q)=1

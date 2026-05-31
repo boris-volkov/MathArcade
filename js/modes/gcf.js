@@ -1,15 +1,11 @@
 import { math } from "../common.js";
+import { ri } from "../utils.js";
 
 let level = 1;
 
 function maxFromLevel(lv) {
   // grow faster, cap higher
   return Math.min(20 + lv * 10, 200);
-}
-
-function randInt(lo, hi) {
-  // inclusive bounds
-  return Math.floor(Math.random() * (hi - lo + 1)) + lo;
 }
 
 // Try to generate numbers that share a factor g >= 2 while
@@ -22,13 +18,13 @@ function generateWithCommonFactor(max) {
   const maxG = Math.max(2, Math.min(12, capFromRange));
   if (maxG < 2) return null;
 
-  const g = randInt(2, maxG);
+  const g = ri(2, maxG);
   const lo = Math.ceil(10 / g);
   const hi = Math.floor(upper / g);
   if (lo > hi) return null;
 
-  const a = g * randInt(lo, hi);
-  const b = g * randInt(lo, hi);
+  const a = g * ri(lo, hi);
+  const b = g * ri(lo, hi);
   return { a, b };
 }
 

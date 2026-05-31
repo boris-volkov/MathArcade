@@ -1,10 +1,10 @@
+import { ri } from "../utils.js";
+
 let level = 1;
 
 function maxNumber(lv) { return Math.min(4 + 2 * lv, 20); }
 function maxDepth(lv)  { return Math.min(1 + Math.floor((lv - 1) / 2), 6); }
 function mulBudgetFromLevel(lv) { return Math.min(1 + Math.floor((lv - 1) / 4), 3); } // cap at 3 multiplications
-
-function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
 function makeNumberNode() { return { kind: 'num', val: ri(1, maxNumber(level)) }; }
 function makeOpNode(op, left, right) { return { kind: 'op', op, left, right }; }

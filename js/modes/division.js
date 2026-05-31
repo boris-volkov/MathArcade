@@ -1,3 +1,5 @@
+import { ri } from "../utils.js";
+
 let level = 1;
 
 // Start strictly within 12x12 facts through level 10.
@@ -8,12 +10,10 @@ function maxFactorFromLevel(lv) {
   return Math.min(12 + extra, 30);         // cap to keep answers manageable
 }
 
-function ri(n) { return Math.floor(Math.random() * n) + 1; }
-
 function generateQuestion() {
   const maxF = maxFactorFromLevel(level);
-  const b = ri(maxF);   // divisor within the current table size
-  const q = ri(maxF);   // quotient (answer) within the same size
+  const b = ri(1, maxF);   // divisor within the current table size
+  const q = ri(1, maxF);   // quotient (answer) within the same size
   const a = b * q;      // dividend so division is exact
 
   const text = `${a} / ${b}`; // ASCII slash for clarity

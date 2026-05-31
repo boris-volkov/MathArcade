@@ -1,8 +1,6 @@
+import { ri, gcd } from "../utils.js";
+
 let level = 1;
-
-function ri(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
 
 function denomFromLevel(lv) {
   // Use denominators that keep degrees integer: 1,2,3,4,6,12
