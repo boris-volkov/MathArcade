@@ -23,11 +23,13 @@ export function setupDynamicChoiceGame({
   const feedbackEl = $("#feedback");
   const statsEl    = $("#stats");
 
-  // Add class for column layout only for factoring
+  // Apply layout class based on mode
   const params = new URLSearchParams(location.search);
   const mode = params.get("mode") || "multiplication";
   if (mode === "factoring") {
     grid.classList.add("dynamic-choices");
+  } else if (mode === "mixed_trig") {
+    grid.classList.add("choices-2col");
   }
 
   let correct = 0, total = 0, start = performance.now();

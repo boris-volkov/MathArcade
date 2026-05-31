@@ -390,6 +390,15 @@ h1 {
   padding: 1rem 0.8rem !important;
 }
 
+/* 2-column × 3-row grid (mixed trig and similar) */
+#answerGrid.choices-2col {
+  max-width: 420px;
+}
+
+#answerGrid.choices-2col button {
+  flex: 0 0 calc((100% - 0.6rem) / 2); /* 1 gap per row → 2 columns */
+}
+
 #negToggle {
   font-weight: 700;
   font-size: 1.4rem;
