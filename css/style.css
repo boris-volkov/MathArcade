@@ -519,6 +519,11 @@ body.fraction-mode .numpad .btn-enter {
   border-color: #38525a;
 }
 
+.section--fractions {
+  background: #252220;
+  border-color: #5a4830;
+}
+
 /* logic section: lighten a bit for contrast */
 .section--logic {
   background: #2b2f33; /* lighter than others */
