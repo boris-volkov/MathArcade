@@ -30,12 +30,13 @@ export function setupGame(config) {
   const mode = (params.get('mode') || 'multiplication').toLowerCase();
   const SHOW_LEVEL_FOR = new Set([
     'addition', 'subtraction', 'multiplication', 'division', 'percents', 'lcm', 'gcf', 'integers',
-    // include boolean expressions mode
-    'logic',
-    // show level for arithmetic expressions as well
-    'expressions',
+    'logic', 'expressions', 'fractions_simplify', 'fractions_arithmetic',
   ]);
   const showLevelUI = SHOW_LEVEL_FOR.has(mode);
+
+  if (new Set(['fractions_simplify', 'fractions_arithmetic']).has(mode)) {
+    document.body.classList.add('fraction-mode');
+  }
 
   const titleEl = $("h1");
   const questionEl = $("#question");
@@ -119,6 +120,7 @@ if (clearBtn) {
     }
     answerEl.value = "";
     feedbackEl.textContent = "";
+    feedbackEl.style.display = "none";
     questionStartAt = performance.now();
   }
   let streak = 0;
@@ -298,93 +300,117 @@ if (clearBtn) {
     }
   }
 
-  // New time-based leveling checkAnswer (smoothed)
+  function onCorrect(dt) {
+    setAwaitingNext(true);
+    feedbackEl.textContent = "";
+    feedbackEl.style.display = "none";
+    answerEl.classList.add("correct");
+    setTimeout(() => answerEl.classList.remove("correct"), flashMs);
+    correctCount++;
+    totalCount++;
+    updateStats();
+    if (typeof generateQuestion.bumpUp === "function") {
+      totalAnswered++;
+      emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
+      progress += BASE_PROGRESS;
+      if (totalAnswered >= START_MIN_TOTAL) {
+        const TARGET_MS = getTargetMs();
+        let timeInc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
+        timeInc = Math.max(-BASE_PROGRESS * 0.5, Math.min(PROGRESS_GAIN, timeInc));
+        progress += timeInc;
+        console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} base=${BASE_PROGRESS.toFixed(2)} time=${timeInc.toFixed(2)} prog=${progress.toFixed(2)}`);
+      }
+      const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
+      if (progress >= 1 && canChange) {
+        generateQuestion.bumpUp();
+        updateLevelIndicator();
+        progress -= 1;
+        lastChangeAtTotal = totalAnswered;
+      }
+    }
+    if (nextTimer) clearTimeout(nextTimer);
+    nextTimer = setTimeout(() => { nextTimer = null; newQuestion(); }, nextDelayMs);
+  }
+
+  function onWrong() {
+    applyWrongGuessPenalty();
+    feedbackEl.textContent = "";
+    feedbackEl.style.display = "none";
+    answerEl.value = "";
+    answerEl.classList.add("wrong");
+    setTimeout(() => answerEl.classList.remove("wrong"), flashMs);
+    totalCount++;
+    updateStats();
+  }
+
   function checkAnswer() {
     if (awaitingNext || currentAnswer == null) return;
+    const dt = performance.now() - questionStartAt;
+
+    // Fraction mode: currentAnswer is {n, d}
+    if (typeof currentAnswer === 'object' && currentAnswer !== null && 'n' in currentAnswer) {
+      const input = answerEl.value.trim();
+      const slash = input.indexOf('/');
+      if (slash === -1) return; // need a slash to submit
+      let gN = parseInt(input.slice(0, slash), 10);
+      let gD = parseInt(input.slice(slash + 1), 10);
+      if (!Number.isFinite(gN) || !Number.isFinite(gD) || gD === 0) return;
+      if (gD < 0) { gN = -gN; gD = -gD; }
+      const { n: cN, d: cD } = currentAnswer;
+      if (gN * cD === cN * gD) {
+        if (gcd(Math.abs(gN), gD) > 1) {
+          feedbackEl.style.display = 'block';
+          feedbackEl.style.color = '#ffb74d';
+          feedbackEl.textContent = 'simplify!';
+          answerEl.value = '';
+          answerEl.classList.add('wrong');
+          setTimeout(() => answerEl.classList.remove('wrong'), flashMs);
+        } else {
+          onCorrect(dt);
+        }
+      } else {
+        onWrong();
+      }
+      return;
+    }
+
+    // Integer mode
     const guess = parseInt(answerEl.value, 10);
     if (!Number.isFinite(guess)) return;
-
     if (guess === currentAnswer) {
-      setAwaitingNext(true);
-      // Visual-only success flash; no text
-      feedbackEl.textContent = "";
-      answerEl.classList.add("correct");
-      setTimeout(() => answerEl.classList.remove("correct"), 150);
-
-      const now = performance.now();
-      const dt = now - questionStartAt; // time spent on this question
-
-      // increment stats for correct answers (for algebra/trig views)
-      correctCount++;
-      totalCount++;
-      updateStats();
-
-      if (typeof generateQuestion.bumpUp === "function") {
-        // Update EMA and progress; use cooldown and gating to smooth changes
-        totalAnswered++;
-        emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
-
-        // Always add base progress for correct answers
-        progress += BASE_PROGRESS;
-
-        if (totalAnswered >= START_MIN_TOTAL) {
-          const TARGET_MS = getTargetMs();
-          let timeInc = ((TARGET_MS - emaDt) / TARGET_MS) * PROGRESS_GAIN;
-          // Cap bonuses at PROGRESS_GAIN (1/5 level) and penalties at half base
-          timeInc = Math.max(-BASE_PROGRESS * 0.5, Math.min(PROGRESS_GAIN, timeInc));
-          progress += timeInc;
-
-          console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} base=${BASE_PROGRESS.toFixed(2)} time=${timeInc.toFixed(2)} prog=${progress.toFixed(2)}`);
-        }
-
-        // Enforce question-count cooldown between level changes
-        const canChange = (totalAnswered - lastChangeAtTotal) >= COOLDOWN_Q;
-
-        if (progress >= 1 && canChange) {
-          generateQuestion.bumpUp();
-          updateLevelIndicator();
-          progress -= 1;
-          lastChangeAtTotal = totalAnswered;
-        }
-      }
-
-      if (nextTimer) clearTimeout(nextTimer);
-      nextTimer = setTimeout(() => {
-        nextTimer = null;
-        newQuestion();
-      }, nextDelayMs);
+      onCorrect(dt);
     } else {
-      applyWrongGuessPenalty();
-      // Visual-only error flash; no text
-      feedbackEl.textContent = "";
-      // Clear previous attempt on wrong answer
-      answerEl.value = "";
-      answerEl.classList.add("wrong");
-      setTimeout(() => answerEl.classList.remove("wrong"), 150);
-      // count attempt for stats and refresh (for modes that show stats)
-      totalCount++;
-      updateStats();
+      onWrong();
     }
   }
   // Shared action handler (used by both pointer and keyboard)
-function handlePress({ digit = null, action = null }) {
-  if (awaitingNext) return;
-  if (digit !== null) {
-    answerEl.value = (answerEl.value === "0") ? digit : (answerEl.value + digit);
-  } else if (action === "clear") {
-    answerEl.value = "";
-  } else if (action === "back") {
-    answerEl.value = answerEl.value.slice(0, -1);
-  } else if (action === "neg") {
-    if (answerEl.value.startsWith("-")) {
-      answerEl.value = answerEl.value.slice(1);
-    } else {
-      answerEl.value = "-" + answerEl.value;
+  function handlePress({ digit = null, action = null }) {
+    if (awaitingNext) return;
+    if (feedbackEl.textContent === 'simplify!') {
+      feedbackEl.textContent = '';
+      feedbackEl.style.display = 'none';
     }
-  } else if (action === "enter") {
-    checkAnswer();
+    if (digit !== null) {
+      answerEl.value = (answerEl.value === "0") ? digit : (answerEl.value + digit);
+    } else if (action === "slash") {
+      const val = answerEl.value;
+      if (!val.includes('/') && val.replace('-', '').length > 0) {
+        answerEl.value = val + '/';
+      }
+    } else if (action === "clear") {
+      answerEl.value = "";
+    } else if (action === "back") {
+      answerEl.value = answerEl.value.slice(0, -1);
+    } else if (action === "neg") {
+      if (answerEl.value.startsWith("-")) {
+        answerEl.value = answerEl.value.slice(1);
+      } else {
+        answerEl.value = "-" + answerEl.value;
+      }
+    } else if (action === "enter") {
+      checkAnswer();
+    }
   }
-}
 
 
   // Pointer/touch: instant
@@ -436,12 +462,20 @@ function handlePress({ digit = null, action = null }) {
       handlePress({ action: "clear" });
     }
 
+    if (k === "/") {
+      const btn = buttons.find(b => b.dataset.action === "slash");
+      if (btn) flash(btn);
+      e.preventDefault();
+      handlePress({ action: "slash" });
+      return;
+    }
+
     if (k === "-") {
-    const btn = buttons.find(b => b.dataset.action === "neg");
-    if (btn) flash(btn);
-    handlePress({ action: "neg" });
-    return;
-  }
+      const btn = buttons.find(b => b.dataset.action === "neg");
+      if (btn) flash(btn);
+      handlePress({ action: "neg" });
+      return;
+    }
   });
 
   newQuestion();

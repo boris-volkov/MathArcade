@@ -277,6 +277,26 @@ h1 {
   background: var(--numpad-neg-btn-bright);
 }
 
+.numpad .btn-slash {
+  display: none;
+  background: #3a4a6a;
+  color: #c0d8f0;
+  font-weight: bold;
+  font-size: 1.6rem;
+}
+
+.numpad .btn-slash:hover {
+  background: #4a5c88;
+}
+
+body.fraction-mode .numpad .btn-slash {
+  display: block;
+}
+
+body.fraction-mode .numpad .btn-enter {
+  grid-column: 1 / -1;
+}
+
 #feedback {
   font-size: 1.1rem;
   min-height: 1.2rem;

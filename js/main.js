@@ -22,6 +22,8 @@ const MODE_PATHS = {
   degrees_to_radians: "./modes/degrees_to_radians.js",
   unitcircle_click: "./modes/unitcircle_click.js",
   mixed_trig: "./modes/mixed_trig.js",
+  fractions_simplify: "./modes/fractions_simplify.js",
+  fractions_arithmetic: "./modes/fractions_arithmetic.js",
 };
 
 const MODE_TITLES = {
@@ -43,6 +45,8 @@ const MODE_TITLES = {
   radians_to_degrees: "Radians to Degrees",
   degrees_to_radians: "Degrees to Radians",
   mixed_trig: "Mixed Trig Practice",
+  fractions_simplify: "Simplify Fractions",
+  fractions_arithmetic: "Fraction Arithmetic",
 };
 
 function modeToTitle(modeKey) {
