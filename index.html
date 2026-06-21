@@ -21,8 +21,6 @@
         <h1 class="brand-mark">MATH<br>ARCADE</h1>
         <img src="logo.png" alt="Math Arcade" class="brand-logo">
       </div>
-      <p class="brand-sub">20 drills across four families. Pick a track and the machine starts.</p>
-
       <!-- Phone-only: pick a family first (big tap targets) -->
       <nav class="family-nav">
         <button class="fam-btn" data-target="fam-arithmetic">
@@ -123,6 +121,18 @@
       });
       document.querySelectorAll('.fam-back').forEach(b => {
         b.addEventListener('click', closeFamily);
+      });
+    })();
+
+    // Show each player's saved level next to leveled drill links
+    (function () {
+      document.querySelectorAll('a.topic').forEach(function (link) {
+        var match = (link.getAttribute('href') || '').match(/[?&]mode=([^&]+)/);
+        if (!match) return;
+        var saved = parseInt(localStorage.getItem('matharcade_level_' + match[1]), 10);
+        if (!isFinite(saved)) return;
+        var tag = link.querySelector('.tag');
+        if (tag) tag.textContent = 'lvl ' + saved;
       });
     })();
   </script>
