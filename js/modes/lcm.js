@@ -4,12 +4,17 @@ import { ri } from "../utils.js";
 let level = 1;
 
 function maxFromLevel(lv) {
-  // Ramp faster with level; allow larger ranges as level climbs
-  if (lv <= 3) return 15;       // small 2–15
-  if (lv <= 6) return 35;       // 2–35
-  if (lv <= 9) return 60;       // 2–60
-  if (lv <= 12) return 120;     // 2–120
-  return Math.min(300, 60 + lv * 20);
+  if (lv <= 1)  return 10;
+  if (lv <= 2)  return 15;
+  if (lv <= 3)  return 20;
+  if (lv <= 4)  return 25;
+  if (lv <= 5)  return 35;
+  if (lv <= 6)  return 45;
+  if (lv <= 7)  return 60;
+  if (lv <= 8)  return 80;
+  if (lv <= 10) return 100;
+  if (lv <= 12) return 150;
+  return Math.min(400, 150 + (lv - 12) * 20);
 }
 
 // Build a product of small primes to create numbers with richer prime factors
@@ -29,8 +34,9 @@ function productOfSmallPrimes(max) {
 
 function generateQuestion() {
   const max = maxFromLevel(level);
-  // Add a third number earlier to boost difficulty growth
-  const useThree = (level >= 9) || (level >= 6 && Math.random() < 0.5);
+  // Gradually introduce a third number from L5, reaching 80% by L9+
+  const threeProb = level <= 4 ? 0 : Math.min(0.8, (level - 4) * 0.15);
+  const useThree = Math.random() < threeProb;
   const count = useThree ? 3 : 2;
 
   const BIAS_PRIMEY = 0.6; // tilt toward prime-rich numbers

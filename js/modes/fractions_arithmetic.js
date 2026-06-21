@@ -5,8 +5,8 @@ let level = 1;
 function pick(arr) { return arr[ri(0, arr.length - 1)]; }
 
 function denomsForLevel(lv) {
-  if (lv <= 2) return [2, 3, 4, 5, 6];
-  if (lv <= 4) return [2, 3, 4, 5, 6, 8];
+  if (lv <= 6) return [2, 3, 4, 5, 6];
+  if (lv <= 8) return [2, 3, 4, 5, 6, 8];
   return [2, 3, 4, 5, 6, 8, 10, 12];
 }
 
@@ -98,8 +98,9 @@ function genDiv(lv) {
 }
 
 function generateQuestion() {
-  const generators = level <= 2 ? [genAdd]
-    : level <= 4 ? [genAdd, genSub]
+  const generators = level <= 3 ? [genAdd]
+    : level <= 6 ? [genAdd, genSub]
+    : level <= 8 ? [genAdd, genSub, genMul]
     : [genAdd, genSub, genMul, genDiv];
 
   for (let attempt = 0; attempt < 20; attempt++) {
