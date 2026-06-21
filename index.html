@@ -101,9 +101,6 @@
         </div>
       </section>
 
-      <div class="arcade-stats">
-        <div class="stat-row"><span class="stat-k">answered</span><span class="stat-v" id="stat-answered">—</span></div>
-      </div>
     </div>
   </div>
 
@@ -140,7 +137,6 @@
       var counter = document.getElementById('bar-counter');
       if (answered > 0) {
         counter.textContent = answered.toLocaleString() + ' problems solved';
-        document.getElementById('stat-answered').textContent = answered.toLocaleString();
       } else {
         counter.textContent = 'no problems solved yet';
       }
