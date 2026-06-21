@@ -345,8 +345,8 @@ body.factoring #answerGrid button,
 .console-dots { display: inline-flex; gap: 7px; }
 .console-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--hair-2); }
 .console-dots i.on { background: var(--amber); }
-.crumb { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--dim); text-decoration: none; }
-.crumb:hover { color: var(--amber); }
+.crumb { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--amber); text-decoration: none; }
+.crumb:hover { color: var(--text-bright); }
 
 /* Question inside the console */
 .console #question {
