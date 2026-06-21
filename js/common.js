@@ -478,5 +478,29 @@ if (clearBtn) {
     }
   });
 
+  // Persist level across sessions via localStorage
+  const SAVE_KEY = `matharcade_level_${mode}`;
+  if (typeof generateQuestion.bumpUp === 'function' && typeof generateQuestion.getLevel === 'function') {
+    // Restore saved level by fast-forwarding bumpUp
+    const saved = parseInt(localStorage.getItem(SAVE_KEY), 10);
+    if (Number.isFinite(saved) && saved > 1) {
+      const start = generateQuestion.getLevel();
+      for (let i = start; i < saved; i++) generateQuestion.bumpUp();
+    }
+    // Wrap bumpUp/bumpDown to auto-save on every level change
+    const origUp = generateQuestion.bumpUp;
+    const origDown = generateQuestion.bumpDown;
+    generateQuestion.bumpUp = () => {
+      origUp();
+      localStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+    };
+    if (typeof origDown === 'function') {
+      generateQuestion.bumpDown = () => {
+        origDown();
+        localStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+      };
+    }
+  }
+
   newQuestion();
 }
