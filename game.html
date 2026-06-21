@@ -70,6 +70,10 @@
   </div>
 
   <script>
+    // Prevent all touch-scroll on the game page (iOS Safari ignores overflow:hidden on body).
+    document.addEventListener('touchmove', function(e) { e.preventDefault(); }, { passive: false });
+  </script>
+  <script>
     // Fill the console breadcrumb from the mode param (display only).
     (function () {
       var LABELS = {

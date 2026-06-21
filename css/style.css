@@ -648,6 +648,7 @@ a.topic:hover .tag { color: var(--amber-dim); }
 body.game {
   padding: 0;
   overscroll-behavior: none;
+  touch-action: none;
 }
 
 @media (max-width: 640px) {
