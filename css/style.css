@@ -634,12 +634,14 @@ a.topic:hover .tag { color: var(--amber-dim); }
   .topics { gap: 9px; }
   a.topic {
     padding: 16px 16px;
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-bright);
     background: var(--panel-2);
     border: 1px solid var(--hair);
     border-radius: 8px;
   }
-  a.topic .tag { font-size: 11px; }
+  a.topic .tag { font-size: 11px; font-weight: 400; }
 
   .arcade-prompt { display: none; }
   #question { font-size: clamp(1.8rem, 9vw, 2.6rem); }
