@@ -15,8 +15,8 @@ function genAdd(lv) {
   for (let i = 0; i < 60; i++) {
     const d1 = pick(denoms);
     const d2 = lv <= 1 ? d1 : pick(denoms);
-    const n1 = ri(1, d1);
-    const n2 = ri(1, d2);
+    const n1 = ri(1, d1 - 1);
+    const n2 = ri(1, d2 - 1);
     const L = lcm(d1, d2);
     if (L > 60) continue;
     const resN = n1 * (L / d1) + n2 * (L / d2);
@@ -37,8 +37,9 @@ function genSub(lv) {
   for (let i = 0; i < 60; i++) {
     const d1 = pick(denoms);
     const d2 = pick(denoms);
-    const n1 = ri(1, d1 * 2);
-    const n2 = ri(1, d2);
+    const n1 = ri(1, d1 * 2 - 1);
+    const n2 = ri(1, d2 - 1);
+    if (n1 % d1 === 0) continue;
     const L = lcm(d1, d2);
     if (L > 60) continue;
     const resN = n1 * (L / d1) - n2 * (L / d2);
@@ -60,8 +61,8 @@ function genMul(lv) {
   for (let i = 0; i < 60; i++) {
     const d1 = pick(denoms);
     const d2 = pick(denoms);
-    const n1 = ri(1, d1);
-    const n2 = ri(1, d2);
+    const n1 = ri(1, d1 - 1);
+    const n2 = ri(1, d2 - 1);
     const resN = n1 * n2, resD = d1 * d2;
     const g = gcd(resN, resD);
     const ansN = resN / g, ansD = resD / g;
@@ -80,8 +81,8 @@ function genDiv(lv) {
   for (let i = 0; i < 60; i++) {
     const d1 = pick(denoms);
     const d2 = pick(denoms);
-    const n1 = ri(1, d1);
-    const n2 = ri(1, d2);
+    const n1 = ri(1, d1 - 1);
+    const n2 = ri(1, d2 - 1);
     // (n1/d1) ÷ (n2/d2) = (n1 * d2) / (d1 * n2)
     const resN = n1 * d2, resD = d1 * n2;
     const g = gcd(resN, resD);
