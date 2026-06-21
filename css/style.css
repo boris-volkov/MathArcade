@@ -54,13 +54,13 @@
   /* SVG unit circle — warm phosphor scheme.
      quadrantal = bright amber, 30° points = dim gold, 45° points = copper */
   --ring-stroke: #4a3f1a;
-  --dot-green-fill: #2a2410;
+  --dot-green-fill: #0d1822;
   --dot-blue-fill: #1c1a12;
   --dot-red-fill: #2a1d12;
-  --ray-green: #FFB000;
+  --ray-green: #5b9bd5;
   --ray-blue: #9a7b3c;
   --ray-red: #d9774e;
-  --ray-green-bright: #ffd27a;
+  --ray-green-bright: #90bfe8;
   --ray-blue-bright: #d8b46a;
   --ray-red-bright: #f0a17a;
 }
