@@ -377,6 +377,7 @@ body.factoring #answerGrid button,
 }
 .console #numpad-ui #answer {
   flex: 1;
+  min-width: 0;
   width: auto;
   text-align: left;
   padding: 0;
