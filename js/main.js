@@ -24,6 +24,8 @@ const MODE_PATHS = {
   mixed_trig: "./modes/mixed_trig.js",
   fractions_simplify: "./modes/fractions_simplify.js",
   fractions_arithmetic: "./modes/fractions_arithmetic.js",
+  fractions_add_sub: "./modes/fractions_add_sub.js",
+  fractions_mul_div: "./modes/fractions_mul_div.js",
 };
 
 const MODE_TITLES = {
@@ -47,6 +49,8 @@ const MODE_TITLES = {
   mixed_trig: "Mixed Trig Practice",
   fractions_simplify: "Simplify Fractions",
   fractions_arithmetic: "Fraction Arithmetic",
+  fractions_add_sub: "Fractions · Add & Subtract",
+  fractions_mul_div: "Fractions · Multiply & Divide",
 };
 
 function modeToTitle(modeKey) {
