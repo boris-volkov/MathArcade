@@ -183,9 +183,15 @@ body::before {
 .numpad .btn-neg:hover { background: var(--numpad-neg-btn-bright); }
 .numpad .btn-slash { display: none; background: var(--panel-2); color: var(--amber-dim); border-color: var(--hair); font-size: 1.7rem; }
 .numpad .btn-slash:hover { background: #211f15; }
+.numpad .btn-back { background: var(--numpad-neg-btn); color: var(--dim); border-color: var(--hair); }
+.numpad .btn-back:hover { background: var(--numpad-neg-btn-bright); }
 
+/* Non-fraction: slash hidden, ⌫ takes its slot, enter spans full width */
+.numpad .btn-enter { grid-column: 1 / -1; }
+
+/* Fraction mode: slash + ⌫ both visible, enter spans last 2 cols */
 body.fraction-mode .numpad .btn-slash { display: block; }
-body.fraction-mode .numpad .btn-enter { grid-column: 1 / -1; }
+body.fraction-mode .numpad .btn-enter { grid-column: 2 / -1; }
 
 .numpad button, #answerGrid button, #negToggle { touch-action: manipulation; }
 
