@@ -368,6 +368,7 @@ body.factoring #answerGrid button,
   border-top: 1px solid var(--hair);
   border-bottom: 1px solid var(--hair);
   border-radius: 0;
+  overflow: visible;
 }
 .console #numpad-ui::before {
   content: "›";
@@ -382,6 +383,7 @@ body.factoring #answerGrid button,
   font-size: 1.7rem;
 }
 .console #numpad-ui .btn-clear-inline {
+  flex-shrink: 0;
   border: 0;
   background: transparent;
   color: var(--color-wrong);
