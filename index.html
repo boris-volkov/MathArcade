@@ -136,7 +136,7 @@
       var answered = parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0;
       var counter = document.getElementById('bar-counter');
       if (answered > 0) {
-        counter.textContent = answered.toLocaleString() + ' problems solved';
+        counter.innerHTML = '<span class="stat-num">' + answered.toLocaleString() + '</span> problems solved';
       } else {
         counter.textContent = 'no problems solved yet';
       }
