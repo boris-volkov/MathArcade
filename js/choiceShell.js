@@ -102,9 +102,11 @@ export function setupChoiceGame({
     negToggle.style.display = "none";
   }
   function updateStats() {
+    if (statsEl) statsEl.style.display = 'none';
+    const barSessionEl = document.getElementById('bar-session');
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    statsEl.innerHTML = `Correct: ${correct}/${total}<br>Rate: ${rate} per min`;
+    if (barSessionEl) barSessionEl.textContent = `${correct}/${total} · ${rate}/min`;
 
     // Only switch once we've answered enough questions
     if (typeof generateQuestion.setUseAllFns === "function" && total >= MIN_TOTAL_FOR_RATE) {

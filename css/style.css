@@ -348,6 +348,7 @@ body.factoring #answerGrid button,
 .console-dots i.on { background: var(--amber); }
 .crumb { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--amber); text-decoration: none; }
 .crumb:hover { color: var(--text-bright); }
+.bar-session { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--dim); white-space: nowrap; }
 
 /* Question inside the console */
 .console #question {

@@ -248,16 +248,13 @@ if (clearBtn) {
   }
 
   function updateStats() {
-    if (!statsEl) return;
-    // Stats visible only for non-level modes (algebra/trig)
-    const showStats = !showLevelUI;
-    statsEl.style.display = showStats ? '' : 'none';
-    if (!showStats) return;
+    if (statsEl) statsEl.style.display = 'none';
+    const barSessionEl = document.getElementById('bar-session');
+    if (!barSessionEl) return;
     const minutes = Math.max(0.001, (performance.now() - sessionStartAt) / 60000);
-    const rate = correctCount / minutes; // correct per minute
+    const rate = correctCount / minutes;
     const rateDisp = rate < 10 ? rate.toFixed(1) : Math.round(rate);
-    // Match unit circle formatting: include total and line break
-    statsEl.innerHTML = `Correct: ${correctCount}/${totalCount}<br>Rate: ${rateDisp} per min`;
+    barSessionEl.textContent = `${correctCount}/${totalCount} · ${rateDisp}/min`;
   }
 
 

@@ -204,10 +204,12 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   let lastKey = null;
 
   function updateStats() {
-    if (!statsEl) return;
+    if (statsEl) statsEl.style.display = 'none';
+    const barSessionEl = document.getElementById('bar-session');
+    if (!barSessionEl) return;
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    statsEl.innerHTML = `Correct: ${correct}/${total}<br>Rate: ${rate} per min`;
+    barSessionEl.textContent = `${correct}/${total} · ${rate}/min`;
   }
 
   let highlightedRay = null;

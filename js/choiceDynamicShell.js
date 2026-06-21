@@ -52,9 +52,12 @@ export function setupDynamicChoiceGame({
   }
 
   function updateStats() {
+    if (statsEl) statsEl.style.display = 'none';
+    const barSessionEl = document.getElementById('bar-session');
+    if (!barSessionEl) return;
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    statsEl.innerHTML = `Correct: ${correct}/${total}<br>Rate: ${rate} per min`;
+    barSessionEl.textContent = `${correct}/${total} · ${rate}/min`;
   }
 
   function buildForQuestion() {
