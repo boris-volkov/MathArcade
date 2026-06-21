@@ -694,6 +694,17 @@ body.game {
     font-size: 1.35rem;
   }
 
+  /* Fraction mode has 5 rows (slash key fills row 4) — shrink to compensate */
+  body.game.fraction-mode .console .numpad {
+    gap: 7px;
+    padding: 8px 12px 10px;
+  }
+
+  body.game.fraction-mode .console .numpad button {
+    padding: 0.5rem;
+    font-size: 1.25rem;
+  }
+
   /* Choice and circle UIs fill remaining space too */
   body.game .console #choice-ui,
   body.game .console #circle-ui {
