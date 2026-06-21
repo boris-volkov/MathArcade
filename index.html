@@ -150,7 +150,7 @@
         var saved = parseInt(localStorage.getItem('matharcade_level_' + match[1]), 10);
         if (!isFinite(saved)) return;
         var tag = link.querySelector('.tag');
-        if (tag) tag.textContent = 'lvl ' + saved;
+        if (tag) { tag.textContent = 'lvl ' + saved; tag.classList.add('tag-lvl'); }
       });
     })();
   </script>

@@ -557,6 +557,7 @@ a.topic {
 }
 a.topic .name::before { content: "› "; color: var(--amber); }
 a.topic .tag { color: var(--dim-2); font-size: 12px; }
+a.topic .tag.tag-lvl { color: var(--amber); }
 a.topic:hover { background: var(--amber-deep); border-color: var(--amber-deep-border); color: var(--text-bright); }
 a.topic:hover .tag { color: var(--amber-dim); }
 
