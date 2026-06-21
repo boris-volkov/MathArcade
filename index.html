@@ -89,7 +89,10 @@
         </div>
       </section>
 
-      <div class="arcade-prompt">select<span class="caret"></span></div>
+      <div class="arcade-stats">
+        <div class="stat-row"><span class="stat-k">answered</span><span class="stat-v" id="stat-answered">—</span></div>
+        <div class="stat-row"><span class="stat-k">correct</span><span class="stat-v" id="stat-correct">—</span></div>
+      </div>
     </div>
   </div>
 
@@ -118,6 +121,16 @@
       document.querySelectorAll('.fam-back').forEach(b => {
         b.addEventListener('click', closeFamily);
       });
+    })();
+
+    // Populate lifetime stats
+    (function () {
+      var answered = parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0;
+      var correct  = parseInt(localStorage.getItem('matharcade_total_correct'),  10) || 0;
+      if (answered === 0) return;
+      var pct = Math.round(correct / answered * 100);
+      document.getElementById('stat-answered').textContent = answered.toLocaleString();
+      document.getElementById('stat-correct').textContent  = correct.toLocaleString() + '  (' + pct + '%)';
     })();
 
     // Show each player's saved level next to leveled drill links

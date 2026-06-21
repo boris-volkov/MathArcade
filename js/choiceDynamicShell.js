@@ -94,8 +94,10 @@ export function setupDynamicChoiceGame({
 
 function onChoice(i, btn) {
     total++;
+    try { localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1); } catch {}
     if (i === currentCorrectIndex) {
       correct++;
+      try { localStorage.setItem('matharcade_total_correct', (parseInt(localStorage.getItem('matharcade_total_correct'), 10) || 0) + 1); } catch {}
       if (btn) flash(btn);
       feedbackEl.textContent = "Correct!";
       feedbackEl.style.color = "#2e7d32";

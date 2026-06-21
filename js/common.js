@@ -309,6 +309,10 @@ if (clearBtn) {
     correctCount++;
     totalCount++;
     updateStats();
+    try {
+      localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
+      localStorage.setItem('matharcade_total_correct',  (parseInt(localStorage.getItem('matharcade_total_correct'),  10) || 0) + 1);
+    } catch {}
     if (typeof generateQuestion.bumpUp === "function") {
       totalAnswered++;
       emaDt = (emaDt == null) ? dt : (emaDt * (1 - EMA_ALPHA) + dt * EMA_ALPHA);
@@ -341,6 +345,9 @@ if (clearBtn) {
     setTimeout(() => answerEl.classList.remove("wrong"), flashMs);
     totalCount++;
     updateStats();
+    try {
+      localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
+    } catch {}
   }
 
   function checkAnswer() {
