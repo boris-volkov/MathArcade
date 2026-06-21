@@ -13,7 +13,7 @@
   <div class="arcade">
     <div class="arcade-bar">
       <span class="dot on"></span><span class="dot"></span><span class="dot"></span>
-      <span class="path">matharcade — 80×24</span>
+      <span class="path" id="bar-counter">—</span>
     </div>
 
     <div class="arcade-body">
@@ -137,8 +137,13 @@
     // Populate lifetime stats
     (function () {
       var answered = parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0;
-      if (answered === 0) return;
-      document.getElementById('stat-answered').textContent = answered.toLocaleString();
+      var counter = document.getElementById('bar-counter');
+      if (answered > 0) {
+        counter.textContent = answered.toLocaleString() + ' problems solved';
+        document.getElementById('stat-answered').textContent = answered.toLocaleString();
+      } else {
+        counter.textContent = 'no problems solved yet';
+      }
     })();
 
     // Show each player's saved level next to leveled drill links
