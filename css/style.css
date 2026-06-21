@@ -147,6 +147,7 @@ body::before {
 .answer-group:focus-within { box-shadow: 0 0 0 1px var(--amber) inset; }
 
 #answer { color: var(--input-text); }
+#answer::placeholder { color: var(--amber-dim); }
 #answer.wrong { background: rgba(217,119,78,.22); color: var(--color-wrong); }
 #answer.correct { background: var(--amber-deep); color: var(--amber); }
 

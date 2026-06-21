@@ -119,6 +119,7 @@ if (clearBtn) {
       questionEl.textContent = text ?? (latex ? String(latex) : "");
     }
     answerEl.value = "";
+    answerEl.placeholder = "";
     feedbackEl.textContent = "";
     feedbackEl.style.display = "none";
     questionStartAt = performance.now();
@@ -366,9 +367,7 @@ if (clearBtn) {
       const { n: cN, d: cD } = currentAnswer;
       if (gN * cD === cN * gD) {
         if (gcd(Math.abs(gN), gD) > 1) {
-          feedbackEl.style.display = 'block';
-          feedbackEl.style.color = '#ffb74d';
-          feedbackEl.textContent = 'simplify!';
+          answerEl.placeholder = 'simplify!';
           answerEl.value = '';
           answerEl.classList.add('wrong');
           setTimeout(() => answerEl.classList.remove('wrong'), flashMs);
@@ -393,9 +392,8 @@ if (clearBtn) {
   // Shared action handler (used by both pointer and keyboard)
   function handlePress({ digit = null, action = null }) {
     if (awaitingNext) return;
-    if (feedbackEl.textContent === 'simplify!') {
-      feedbackEl.textContent = '';
-      feedbackEl.style.display = 'none';
+    if (answerEl.placeholder === 'simplify!') {
+      answerEl.placeholder = '';
     }
     if (digit !== null) {
       answerEl.value = (answerEl.value === "0") ? digit : (answerEl.value + digit);
