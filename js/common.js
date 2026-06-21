@@ -51,7 +51,7 @@ export function setupGame(config) {
   const clearBtn = document.querySelector("#clearBtn");
 if (clearBtn) {
   clearBtn.addEventListener("click", () => {
-    handlePress({ action: "clear" });
+    handlePress({ action: "back" });
   });
 }
 
