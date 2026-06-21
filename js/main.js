@@ -73,6 +73,7 @@ async function boot() {
     const gameTitle = cfg.title || modeToTitle(mode);
     document.title = `${gameTitle} | Math Arcade`;
     const uiType = cfg.uiType || 'numpad';
+    document.body.classList.add('ui-' + uiType);
 
     if (uiType === 'numpad') {
       const { setupGame } = await import('./common.js');

@@ -671,15 +671,17 @@ body.game {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Question expands to fill leftover vertical space */
+  /* Question layout — shared */
   body.game .console #question {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 12px 20px;
     font-size: clamp(1.6rem, 8vw, 2.4rem);
   }
+
+  /* Numpad: question fills leftover vertical space above the pad */
+  body.game.ui-numpad .console #question { flex: 1; }
 
   /* Tighten numpad so it fits comfortably */
   body.game .console .numpad {
