@@ -641,3 +641,57 @@ a.topic:hover .tag { color: var(--amber-dim); }
   .arcade-prompt { display: none; }
   #question { font-size: clamp(1.8rem, 9vw, 2.6rem); }
 }
+
+/* ============================================================
+   GAME PAGE — fill viewport, no scroll
+   ============================================================ */
+body.game {
+  padding: 0;
+  overscroll-behavior: none;
+}
+
+@media (max-width: 640px) {
+  body.game {
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body.game .console {
+    height: 100dvh;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Question expands to fill leftover vertical space */
+  body.game .console #question {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: clamp(1.6rem, 8vw, 2.4rem);
+  }
+
+  /* Tighten numpad so it fits comfortably */
+  body.game .console .numpad {
+    padding: 10px 12px 14px;
+    gap: 9px;
+  }
+
+  body.game .console .numpad button {
+    padding: 0.75rem;
+    font-size: 1.35rem;
+  }
+
+  /* Choice and circle UIs fill remaining space too */
+  body.game .console #choice-ui,
+  body.game .console #circle-ui {
+    flex: 1;
+    overflow-y: auto;
+  }
+}
