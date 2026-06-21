@@ -7,58 +7,87 @@
   <title>Math Game</title>
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <div id="question"></div>
-
-  <!-- Numpad UI -->
-  <div class="answer-group" id="numpad-ui" style="display: none;">
-    <input id="answer" type="text" inputmode="numeric" readonly />
-    <button id="clearBtn" class="btn-clear-inline" aria-label="Clear answer">C</button>
-  </div>
-
-  <div class="numpad" id="numpad" style="display: none;">
-    <button data-digit="1">1</button>
-    <button data-digit="2">2</button>
-    <button data-digit="3">3</button>
-
-    <button data-digit="4">4</button>
-    <button data-digit="5">5</button>
-    <button data-digit="6">6</button>
-
-    <button data-digit="7">7</button>
-    <button data-digit="8">8</button>
-    <button data-digit="9">9</button>
-
-    <button data-action="neg" class="btn-neg">±</button>
-    <button data-digit="0">0</button>
-    <button data-action="slash" class="btn-slash">╱</button>
-    <button data-action="enter" class="btn-enter">-></button>
-  </div>
-
-  <!-- Choice UI -->
-  <div id="choice-ui" style="display: none;">
-    <div id="answerGrid">
-      <button id="negToggle" title="Toggle negative">−</button>
-      <!-- Answer buttons will be injected -->
+  <div class="console">
+    <!-- console chrome -->
+    <div class="console-bar">
+      <span class="console-dots"><i class="on"></i><i></i><i></i></span>
+      <a class="crumb" id="crumb" href="index.html">› home</a>
     </div>
+
+    <div id="question"></div>
+
+    <!-- Numpad UI -->
+    <div class="answer-group" id="numpad-ui" style="display: none;">
+      <input id="answer" type="text" inputmode="numeric" readonly />
+      <button id="clearBtn" class="btn-clear-inline" aria-label="Clear answer">C</button>
+    </div>
+
+    <div class="numpad" id="numpad" style="display: none;">
+      <button data-digit="1">1</button>
+      <button data-digit="2">2</button>
+      <button data-digit="3">3</button>
+
+      <button data-digit="4">4</button>
+      <button data-digit="5">5</button>
+      <button data-digit="6">6</button>
+
+      <button data-digit="7">7</button>
+      <button data-digit="8">8</button>
+      <button data-digit="9">9</button>
+
+      <button data-action="neg" class="btn-neg">±</button>
+      <button data-digit="0">0</button>
+      <button data-action="slash" class="btn-slash">╱</button>
+      <button data-action="enter" class="btn-enter">↵</button>
+    </div>
+
+    <!-- Choice UI -->
+    <div id="choice-ui" style="display: none;">
+      <div id="answerGrid">
+        <button id="negToggle" title="Toggle negative">−</button>
+        <!-- Answer buttons will be injected -->
+      </div>
+    </div>
+
+    <!-- Circle UI -->
+    <div id="circle-ui" style="display: none;">
+      <div id="circleMount"></div>
+    </div>
+
+    <div id="feedback"></div>
+    <!-- Progress bar for leveled games -->
+    <div id="progressBar" class="progress-bar" style="display: none;">
+      <div id="progressText" class="progress-text"></div>
+      <div class="progress-track">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
+    <!-- Stats for non-level modes (algebra/trig) -->
+    <div id="stats"></div>
   </div>
 
-  <!-- Circle UI -->
-  <div id="circle-ui" style="display: none;">
-    <div id="circleMount"></div>
-  </div>
-
-  <div id="feedback"></div>
-  <!-- Progress bar for leveled games -->
-  <div id="progressBar" class="progress-bar" style="display: none;">
-    <div id="progressFill" class="progress-fill"></div>
-    <div id="progressText" class="progress-text"></div>
-  </div>
-  <!-- Stats for non-level modes (algebra/trig) -->
-  <div id="stats"></div>
+  <script>
+    // Fill the console breadcrumb from the mode param (display only).
+    (function () {
+      var LABELS = {
+        addition: 'addition', subtraction: 'subtraction', integers: 'integers ±',
+        multiplication: 'multiplication', division: 'division', percents: 'percents',
+        expressions: 'expressions', lcm: 'lcm', gcf: 'gcf',
+        fractions_simplify: 'fractions · simplify', fractions_arithmetic: 'fractions · arithmetic',
+        factoring: 'factoring', logarithms: 'logarithms', logic: 'boolean expressions',
+        unitcircle_click: 'unit circle', unitcircle: 'functions', inverse_trig: 'inverse functions',
+        radians_to_degrees: 'radians → degrees', degrees_to_radians: 'degrees → radians',
+        mixed_trig: 'mixed practice'
+      };
+      var m = (new URLSearchParams(location.search).get('mode') || 'multiplication');
+      var pretty = LABELS[m] || m.replace(/_/g, ' ');
+      var el = document.getElementById('crumb');
+      if (el) el.textContent = '› ' + pretty;
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>

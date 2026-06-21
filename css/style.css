@@ -1,547 +1,635 @@
+/* ============================================================
+   MATH ARCADE — "Phosphor" theme
+   One amber phosphor on warm black. Mono UI, serif math.
+   Drop-in replacement for css/style.css — no JS changes needed.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=IBM+Plex+Mono:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
 :root {
   /* Page */
-  --bg: #15171c;
-  --text: #c4f2f2;
+  --bg: #0d0d0a;
+  --panel: #16150f;
+  --panel-2: #1b1a12;
+  --text: #e8dcc0;
+  --text-bright: #f3e9cf;
+  --dim: #8a7f63;
+  --dim-2: #6b6450;
+  --hair: #2a2718;
+  --hair-2: #3a3526;
+
+  /* Accent */
+  --amber: #FFB000;
+  --amber-dim: #b07a17;
+  --amber-deep: #241f10;
+  --amber-deep-border: #4a3f1a;
 
   /* Input field */
-  --input-bg: #312c2c;
-  --input-text: #b7f7b7;
+  --input-bg: #16150f;
+  --input-text: #f3e9cf;
 
   /* Correct / wrong feedback */
-  --color-correct: #1e5a1e;
-  --color-correct-bright: #2d7d2d;
-  --color-wrong: #de6b6b;
-  --color-wrong-dark: #5a1e1e;
-  --color-wrong-dark-bright: #822;
+  --color-correct: var(--amber-deep);
+  --color-correct-bright: #4a3f1a;
+  --color-wrong: #d9774e;
+  --color-wrong-dark: #2a1812;
+  --color-wrong-dark-bright: #3a2218;
 
   /* Numpad buttons */
-  --numpad-btn: #363f50;
-  --numpad-text: #c0f2ae;
-  --numpad-neg-btn: #333366;
-  --numpad-neg-btn-bright: #5555aa;
+  --numpad-btn: #1b1a12;
+  --numpad-text: #d8cba6;
+  --numpad-neg-btn: #1b1a12;
+  --numpad-neg-btn-bright: #2a2718;
 
   /* Accent / links */
-  --accent: #5a80a3;
+  --accent: var(--amber);
 
   /* Progress bar */
-  --progress-fill: #009dff;
+  --progress-fill: var(--amber);
 
   /* Menu */
-  --menu-item-bg: #211d1d;
-  --menu-border: #635c5c;
+  --menu-item-bg: #1b1a12;
+  --menu-border: #2a2718;
 
-  /* SVG unit circle */
-  --ring-stroke: #635c5c;
-  --dot-green-fill: #1e5a1e;
-  --dot-blue-fill: #262e3a;
-  --dot-red-fill: #3a2626;
-  --ray-green: #4caf50;
-  --ray-blue: #5a80a3;
-  --ray-red: #b74e4e;
-  --ray-green-bright: #81c784;
-  --ray-blue-bright: #90caf9;
-  --ray-red-bright: #ef9a9a;
+  /* SVG unit circle — warm phosphor scheme.
+     quadrantal = bright amber, 30° points = dim gold, 45° points = copper */
+  --ring-stroke: #4a3f1a;
+  --dot-green-fill: #2a2410;
+  --dot-blue-fill: #1c1a12;
+  --dot-red-fill: #2a1d12;
+  --ray-green: #FFB000;
+  --ray-blue: #9a7b3c;
+  --ray-red: #d9774e;
+  --ray-green-bright: #ffd27a;
+  --ray-blue-bright: #d8b46a;
+  --ray-red-bright: #f0a17a;
 }
+
+* { box-sizing: border-box; }
 
 /* Layout / typography */
 body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 1rem;
+  margin: 0;
+  min-height: 100vh;
   background: var(--bg);
   color: var(--text);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Vertical layout for factoring game */
-body.factoring #answerGrid {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  gap: 0.6rem;
-  width: 100%;
-  max-width: 500px;
-  margin: 1rem auto;
-  align-items: stretch;
-  /* a bit wider since expressions are long */
+/* Subtle CRT scanline wash over everything */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0) 0 2px, rgba(0,0,0,.10) 2px 3px),
+    radial-gradient(130% 90% at 50% 0%, rgba(255,176,0,.04), transparent 60%);
 }
 
-body.factoring #answerGrid button {
-  flex: 1 1 auto;
-  width: 100%;
-  text-align: center;
-  padding: 1rem 0.8rem;
-}
-
-h1 {
-  margin: 0.5rem 0;
-  font-size: 3rem;
-}
-
-.site-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* push title left, logo right */
-  width: 100%;
-  max-width: 920px;
-  /* same as your section width for balance */
-  margin-bottom: 0;
-}
-
-.site-header .logo {
-  width: 128px;
-  height: 128px;
-  object-fit: contain;
-}
-
-.site-header h1 {
-  margin: 0;
-  font-size: 2rem;
-}
-
+/* ---------- Question ---------- */
 #question {
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-  margin: 1rem 0;
-  text-align: center;
-}
-
-/* Apply retro font only to game elements */
-#question,
-#answer,
-#answerGrid button,
-.btn-clear-inline,
-.numpad button {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
-  /* smaller so it fits */
-  line-height: 1.2;
-  /* tighter line spacing */
-}
-
-#question {
-  font-size: 1.5rem;
-  /* override for question */
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: clamp(2rem, 6vw, 3rem);
   font-weight: 700;
-  letter-spacing: 0.5px;
+  color: var(--text-bright);
+  margin: 1.4rem 0 1.1rem;
+  text-align: center;
+  line-height: 1.15;
 }
+/* KaTeX inherits the bright bone color */
+#question .katex { color: var(--text-bright); }
 
-
-/* Seamless input + clear button group */
+/* ---------- Numpad answer field ---------- */
 .answer-group {
   display: inline-flex;
   align-items: stretch;
-  /*border: 1px solid #aac3c6;* /
-  /*border-radius: 10px;*/
   background: var(--input-bg);
-  /* same as your input bg */
+  border: 1px solid var(--hair-2);
+  border-radius: 5px;
   overflow: hidden;
-  /* clip inner corners */
-  margin-bottom: 1rem;
-  /* replaces old #answer margin */
+  margin-bottom: 1.2rem;
 }
-
-/* Let the group own the border/radius; input becomes flat inside */
 .answer-group #answer {
   border: 0;
   border-radius: 0;
   margin: 0;
-  /* kill existing bottom margin */
   background: transparent;
-  /* inherit group bg */
   color: var(--input-text);
-  font-size: 1.5rem;
-  /* keep your current size */
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 1.7rem;
   text-align: center;
-  width: 8ch;
-  padding: 0.35rem 0.75rem;
-  /* vertical height control */
+  width: 7ch;
+  padding: 0.5rem 0.85rem;
   line-height: 1.2;
 }
-
-/* Inline clear matches height and rounds on the right */
 .answer-group .btn-clear-inline {
   border: 0;
-  /* divider between input and button */
+  border-left: 1px solid var(--hair-2);
   background: var(--color-wrong-dark);
-  color: #fff;
+  color: var(--color-wrong);
+  font-family: 'IBM Plex Mono', monospace;
   font-weight: 700;
-  padding: 0 0.8rem;
-  /* no vertical padding needed; group controls height */
+  padding: 0 0.95rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
+.answer-group .btn-clear-inline:hover { background: var(--color-wrong-dark-bright); }
+.answer-group:focus-within { box-shadow: 0 0 0 1px var(--amber) inset; }
 
-/* Hover/focus states */
-.answer-group .btn-clear-inline:hover {
-  background: var(--color-wrong-dark-bright);
-}
+#answer { color: var(--input-text); }
+#answer.wrong { background: rgba(217,119,78,.22); color: var(--color-wrong); }
+#answer.correct { background: var(--amber-deep); color: var(--amber); }
 
-.answer-group:focus-within {
-  box-shadow: 0 0 0 2px rgba(183, 247, 183, 0.15) inset;
-}
-
-/* Keep your existing "wrong" feedback effect working */
-#answer.wrong {
-  background: var(--color-wrong);
-  /* will fill the left side of the pill */
-  border-color: transparent;
-}
-
-#answer {
-  font-size: 1.5rem;
-  text-align: center;
-  width: 8ch;
-  padding: 0.35rem 0.5rem;
-  margin-bottom: 1rem;
-  border-radius: 10px;
-  background: var(--input-bg);
-  color: var(--input-text);
-}
-
-#answer.wrong {
-  background: var(--color-wrong);
-  border-color: #282222;
-}
-
-/* brief success flash */
-#answer.correct {
-  background: var(--color-correct);
-  border-color: var(--color-correct);
-  color: #fff;
-}
-
-/* Responsive numpad */
+/* ---------- Numpad ---------- */
 .numpad {
   display: grid;
   grid-template-columns: repeat(3, minmax(64px, 1fr));
-  gap: 10px;
-  margin-bottom: 1rem;
+  gap: 12px;
+  margin-bottom: 1.2rem;
   width: 100%;
   max-width: 320px;
 }
-
 .numpad button {
-  font-size: 1.4rem;
-  padding: 0.9rem;
-  border-radius: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.5rem;
+  font-weight: 500;
+  padding: 0.95rem;
+  border-radius: 6px;
   background: var(--numpad-btn);
-  border: none;
-  user-select: none;
+  border: 1px solid var(--hair);
   color: var(--numpad-text);
-}
-
-.numpad button.active {
-  background: #b7f7b7;
-}
-
-/* flash green */
-
-/* Special styles for Clear and Enter */
-.numpad .btn-clear {
-  background: var(--color-wrong-dark);
-  /* deep red */
-  color: #fff;
-  font-weight: bold;
-}
-
-.numpad .btn-clear:hover {
-  background: var(--color-wrong-dark-bright);
-  /* lighter red */
-}
-
-.numpad .btn-enter {
-  background: var(--color-correct);
-  /* deep green */
-  color: #fff;
-  font-weight: bold;
-}
-
-.numpad .btn-enter:hover {
-  background: var(--color-correct-bright);
-  /* lighter green */
-}
-
-.numpad .btn-neg {
-  background: var(--numpad-neg-btn);
-  /* bluish */
-  color: #fff;
-  font-weight: bold;
-}
-
-.numpad .btn-neg:hover {
-  background: var(--numpad-neg-btn-bright);
-}
-
-.numpad .btn-slash {
-  display: none;
-  background: #3a4a6a;
-  color: #c0d8f0;
-  font-weight: bold;
-  font-size: 1.6rem;
-}
-
-.numpad .btn-slash:hover {
-  background: #4a5c88;
-}
-
-body.fraction-mode .numpad .btn-slash {
-  display: block;
-}
-
-body.fraction-mode .numpad .btn-enter {
-  grid-column: 1 / -1;
-}
-
-#feedback {
-  font-size: 1.1rem;
-  min-height: 1.2rem;
-  margin-top: 0.25rem;
-  text-align: center;
-}
-
-.numpad button,
-#answerGrid button,
-#negToggle {
-  touch-action: manipulation;
-}
-
-/* Landing menu */
-.menu {
-  display: grid;
-  grid-template-columns: minmax(200px, 320px);
-  gap: 12px;
-  margin-top: 2rem;
-  width: 100%;
-  justify-content: center;
-}
-
-.menu a {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  justify-content: center;
-  padding: 1rem;
-  border-radius: 12px;
-  background: var(--menu-item-bg);
-  border: 1px solid var(--menu-border);
-  font-size: 1.1rem;
-  text-decoration: none;
-  color: #cce4ed;
-  transition: background 0.15s ease;
-}
-
-.menu a:hover {
-  background: var(--accent);
-}
-
-
-/* --- Choice grid shell (unit circle, etc.) --- */
-.choice-wrap {
-  display: grid;
-  gap: 0.8rem;
-  justify-items: center;
-}
-
-/* Responsive sizing for the SVG circle board: near-full width on phones, capped on desktop */
-.circle-svg {
-  /* ~90% viewport width on phones; cap on desktop */
-  width: min(90vw, 600px);
-  height: auto;
-  display: block;
-  margin-bottom: 0.8rem; /* add breathing room above stats */
-}
-
-#answerGrid {
-  /* Use flex so incomplete rows center nicely */
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  justify-content: center;
-  margin: 1rem auto;
-  width: 100%;
-  max-width: 420px;
-}
-
-#answerGrid button {
-  font-size: 1.2rem;
-  border-radius: 10px;
-  border: 1px solid #1e2222;
-  background: #262424;
-  color: #e9e2e2;
-  padding: 1rem 0.8rem;
   user-select: none;
-  transition: background 0.15s ease;
-  /* Force three columns while allowing wrap; center incomplete rows */
-  box-sizing: border-box;
-  flex: 0 0 calc((100% - 1.2rem) / 3); /* 2 gaps of 0.6rem per row */
-  text-align: center;
+  cursor: pointer;
+  transition: background .1s ease, border-color .1s ease;
 }
+.numpad button:hover { border-color: var(--hair-2); background: #211f15; }
+.numpad button.active { background: var(--amber); border-color: var(--amber); color: var(--bg); }
 
-#answerGrid button.active {
-  background: #b7f7b7;
-}
+.numpad .btn-clear { background: var(--color-wrong-dark); color: var(--color-wrong); border-color: #3a2218; }
+.numpad .btn-clear:hover { background: var(--color-wrong-dark-bright); }
+.numpad .btn-enter { background: var(--amber); border-color: var(--amber); color: var(--bg); font-weight: 700; }
+.numpad .btn-enter:hover { background: #ffc233; }
+.numpad .btn-neg { background: var(--numpad-neg-btn); color: var(--dim); border-color: var(--hair); }
+.numpad .btn-neg:hover { background: var(--numpad-neg-btn-bright); }
+.numpad .btn-slash { display: none; background: var(--panel-2); color: var(--amber-dim); border-color: var(--hair); font-size: 1.7rem; }
+.numpad .btn-slash:hover { background: #211f15; }
 
-#answerGrid button.wrong {
-  background: var(--ray-red-bright);
-}
+body.fraction-mode .numpad .btn-slash { display: block; }
+body.fraction-mode .numpad .btn-enter { grid-column: 1 / -1; }
 
-/* Dynamic choices (factoring) - column layout */
-#answerGrid.dynamic-choices {
-  display: flex !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-  gap: 0.6rem !important;
-  width: 100% !important;
-  max-width: 500px !important;
-  margin: 1rem auto !important;
-  align-items: stretch !important;
-  justify-content: center !important; /* reset */
-}
+.numpad button, #answerGrid button, #negToggle { touch-action: manipulation; }
 
-#answerGrid.dynamic-choices button {
-  flex: 0 0 auto !important; /* reset from calc */
-  width: 100% !important;
-  text-align: center !important;
-  padding: 1rem 0.8rem !important;
-}
-
-/* 2-column × 3-row grid (mixed trig and similar) */
-#answerGrid.choices-2col {
-  max-width: 420px;
-}
-
-#answerGrid.choices-2col button {
-  flex: 0 0 calc((100% - 0.6rem) / 2); /* 1 gap per row → 2 columns */
-}
-
-#negToggle {
-  font-weight: 700;
-  font-size: 1.4rem;
-  background: #c0f2ae;
-  color: #e3e9e4;
-  border: 1px solid #444;
-}
-
-#negToggle.active {
-  background: #4caf50;
-  color: #fff;
-}
-
-#feedback, 
-#stats {
-  text-align: center;
-}
-
-/* Hide textual feedback; rely on visual cues instead */
+/* ---------- Feedback (hidden; visual cues only) ---------- */
 #feedback { display: none; }
+#feedback, #stats { text-align: center; }
 
-/* Progress bar for leveled games */
+#stats {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--dim);
+  line-height: 1.6;
+  margin-top: 0.4rem;
+}
+
+/* ---------- Progress bar ---------- */
 .progress-bar {
   position: relative;
   width: 100%;
   max-width: 320px;
-  height: 2rem;
-  margin: 0.5rem auto;
-  background: var(--input-bg);
-  border: none;
-  border-radius: 10px;
+  height: 1.9rem;
+  margin: 0.6rem auto;
+  background: var(--panel);
+  border: 1px solid var(--hair);
+  border-radius: 6px;
   overflow: hidden;
 }
-
 .progress-fill {
   height: 100%;
-  background: var(--progress-fill); /* Solid color for iOS Safari compatibility */
+  background: var(--amber);
   width: 0%;
-  /* Removed transition for iOS Safari compatibility */
+  box-shadow: 0 0 12px rgba(255,176,0,.5);
 }
-
 .progress-text {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 0.9rem;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  mix-blend-mode: difference;
   pointer-events: none;
 }
-
-/* Small red level indicator for arithmetic games */
 .level-indicator {
   margin-top: 0.5rem;
-  font-size: 0.8rem;
-  color: #ff6b6b; /* soft red */
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--amber-dim);
   text-align: center;
-  opacity: 0.95;
 }
 
+/* ---------- Choice grid (trig / logarithms) ---------- */
+.choice-wrap { display: grid; gap: 0.8rem; justify-items: center; }
 
-/* --- Section cards by topic --- */
-.section {
-  width: 100%;
-  max-width: 920px;
-  margin: 0 0 1.5rem;
-  padding: 1.25rem 1rem;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
-}
-
-
-.section h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: 0.3px;
-}
-
-/* subtle, distinct tints that still fit the dark theme */
-.section--arithmetic {
-  background: #232729;
-  border-color: #374246;
-}
-
-.section--algebra {
-  background: #242327;
-  /* slight magenta tint */
-  border-color: #433b51;
-}
-
-.section--trig {
-  background: #21282b;
-  /* slight teal/blue tint */
-  border-color: #38525a;
-}
-
-.section--fractions {
-  background: #252220;
-  border-color: #5a4830;
-}
-
-/* logic section: lighten a bit for contrast */
-.section--logic {
-  background: #2b2f33; /* lighter than others */
-  border-color: #5a6a73; /* softer, cooler border */
-}
-
-/* make menus lay out nicely inside sections */
-.section .menu {
+#answerGrid {
   display: flex;
-  flex-direction: column;
-  /* stack children vertically */
-  gap: 12px;
-  /* keep spacing */
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: center;
+  margin: 1.2rem auto;
+  width: 100%;
+  max-width: 440px;
+}
+#answerGrid button {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 1.35rem;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--hair);
+  border-radius: 7px;
+  padding: 1rem 0.8rem;
+  user-select: none;
+  cursor: pointer;
+  box-sizing: border-box;
+  flex: 0 0 calc((100% - 1.4rem) / 3);
+  text-align: center;
+  white-space: nowrap;
+  transition: background .1s ease, border-color .1s ease;
+}
+#answerGrid button .katex { white-space: nowrap; }
+#answerGrid button:hover { border-color: var(--amber-deep-border); background: #211f15; }
+#answerGrid button .katex { color: var(--text); }
+#answerGrid button.active { background: var(--amber); border-color: var(--amber); }
+#answerGrid button.active .katex { color: var(--bg); }
+#answerGrid button.wrong { background: rgba(217,119,78,.25); border-color: var(--color-wrong); }
+
+/* negate toggle */
+#negToggle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 1.3rem;
+  background: var(--panel-2);
+  color: var(--dim);
+  border: 1px solid var(--hair);
+  border-radius: 7px;
+  cursor: pointer;
+}
+#negToggle.active { background: var(--amber); color: var(--bg); border-color: var(--amber); }
+
+/* 2-column variant (mixed trig) */
+#answerGrid.choices-2col { max-width: 420px; }
+#answerGrid.choices-2col button { flex: 0 0 calc((100% - 0.7rem) / 2); }
+
+/* Dynamic column choices (factoring) */
+body.factoring #answerGrid,
+#answerGrid.dynamic-choices {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  gap: 0.7rem !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  margin: 1.2rem auto !important;
+  align-items: stretch !important;
+}
+body.factoring #answerGrid button,
+#answerGrid.dynamic-choices button {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  text-align: center !important;
+  padding: 1rem 0.9rem !important;
+  font-size: 1.2rem;
 }
 
-/* a touch more size/weight for links inside cards */
-.section .menu a {
-  font-size: 1.05rem;
-  padding: 0.9rem 1rem;
-  border-color: #8eadbb;
+/* ---------- Unit-circle board ---------- */
+.circle-svg {
+  width: min(90vw, 560px);
+  height: auto;
+  display: block;
+  margin: 0.5rem auto 1rem;
+}
+
+/* ============================================================
+   GAME CONSOLE — question, answer & pad as one bordered panel.
+   Scoped to .console so the floating defaults still work elsewhere.
+   ============================================================ */
+.console {
+  width: 100%;
+  max-width: 460px;
+  margin: 0.5rem auto;
+  background: var(--bg);
+  border: 1px solid var(--hair);
+  border-radius: 14px;
+  overflow: hidden;
+}
+.console-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--hair);
+}
+.console-dots { display: inline-flex; gap: 7px; }
+.console-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--hair-2); }
+.console-dots i.on { background: var(--amber); }
+.crumb { font: 400 11px/1 'IBM Plex Mono', monospace; color: var(--dim); text-decoration: none; }
+.crumb:hover { color: var(--amber); }
+
+/* Question inside the console */
+.console #question {
+  margin: 0;
+  padding: 30px 20px 24px;
+  font-size: clamp(2rem, 7vw, 2.8rem);
+}
+
+/* Answer row — full-width seamed bar with a prompt */
+.console #numpad-ui {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 18px;
+  background: var(--panel);
+  border: 0;
+  border-top: 1px solid var(--hair);
+  border-bottom: 1px solid var(--hair);
+  border-radius: 0;
+}
+.console #numpad-ui::before {
+  content: "›";
+  font: 700 22px/1 'IBM Plex Mono', monospace;
+  color: var(--amber);
+}
+.console #numpad-ui #answer {
+  flex: 1;
+  width: auto;
+  text-align: left;
+  padding: 0;
+  font-size: 1.7rem;
+}
+.console #numpad-ui .btn-clear-inline {
+  border: 0;
+  background: transparent;
+  color: var(--color-wrong);
+  font-size: 0.95rem;
+  padding: 6px 9px;
+  border-radius: 5px;
+}
+.console #numpad-ui .btn-clear-inline:hover { background: var(--color-wrong-dark); }
+
+/* Numpad fills the console width */
+.console .numpad {
+  max-width: none;
+  width: auto;
+  margin: 0;
+  padding: 16px;
+}
+
+/* Choice & circle modes seam from the question the same way */
+.console #choice-ui,
+.console #circle-ui {
+  border-top: 1px solid var(--hair);
+  padding: 16px 16px 6px;
+}
+.console #answerGrid { margin: 0.4rem auto 1rem; }
+.console .circle-svg { width: 100%; max-width: 100%; margin: 0.5rem auto; }
+
+/* Footer band: progress (leveled) or stats (algebra/trig) */
+.console .progress-bar {
+  max-width: none;
+  width: auto;
+  margin: 0;
+  padding: 13px 16px;
+  background: var(--panel);
+  border: 0;
+  border-top: 1px solid var(--hair);
+  border-radius: 0;
+  height: auto;
+}
+.console .progress-text {
+  position: static;
+  transform: none;
+  mix-blend-mode: normal;
+  text-shadow: none;
+  text-align: left;
+  color: var(--amber-dim);
+  font: 600 0.72rem/1 'IBM Plex Mono', monospace;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.console .progress-track {
+  height: 7px;
+  border-radius: 4px;
+  background: var(--panel-2);
+  overflow: hidden;
+}
+.console .progress-fill {
+  height: 100%;
+  background: var(--amber);
+  box-shadow: 0 0 10px rgba(255, 176, 0, .5);
+}
+.console #stats {
+  margin: 0;
+  padding: 13px 16px;
+  border-top: 1px solid var(--hair);
+}
+
+/* ============================================================
+   LANDING PAGE (index.html) — "directory" on desktop,
+   two-level drill-down on phones.
+   ============================================================ */
+.arcade {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+/* Top chrome bar */
+.arcade-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
+  background: var(--panel);
+  border: 1px solid var(--hair);
+  border-radius: 8px 8px 0 0;
+}
+.arcade-bar .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--hair-2); }
+.arcade-bar .dot.on { background: var(--amber); }
+.arcade-bar .path { margin-left: 8px; font-size: 11px; color: var(--dim); }
+
+.arcade-body {
+  background: var(--bg);
+  border: 1px solid var(--hair);
+  border-top: 0;
+  border-radius: 0 0 8px 8px;
+  padding: 26px 26px 30px;
+}
+
+/* Brand row */
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.brand-mark {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--amber);
+  text-shadow: 0 0 12px rgba(255,176,0,.45);
+  margin: 0;
+}
+.brand-logo {
+  width: 76px; height: 76px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid var(--hair);
+  filter: sepia(.5) hue-rotate(345deg) saturate(1.2) brightness(.95);
+}
+.brand-sub {
+  font-family: 'Source Serif 4', Georgia, serif;
+  font-size: 14px;
+  color: #c8bb97;
+  border-bottom: 1px dashed var(--hair);
+  padding-bottom: 16px;
+  margin: 0 0 14px;
+}
+
+/* Mobile family chooser — hidden on desktop */
+.family-nav { display: none; }
+
+/* Family directory blocks */
+.family { display: block; margin-bottom: 18px; }
+.family:last-child { margin-bottom: 0; }
+.fam-back { display: none; }
+
+.fam-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  color: var(--amber);
+  margin: 6px 0 9px;
+}
+.fam-title .count { color: var(--dim-2); font-weight: 400; }
+
+.topics { display: flex; flex-direction: column; gap: 5px; }
+
+a.topic {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  color: var(--text);
+  padding: 5px 6px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  transition: background .1s ease, border-color .1s ease;
+}
+a.topic .name::before { content: "› "; color: var(--amber); }
+a.topic .tag { color: var(--dim-2); font-size: 12px; }
+a.topic:hover { background: var(--amber-deep); border-color: var(--amber-deep-border); color: var(--text-bright); }
+a.topic:hover .tag { color: var(--amber-dim); }
+
+.arcade-prompt {
+  margin-top: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--amber);
+}
+.arcade-prompt .caret {
+  display: inline-block; width: 8px; height: 15px;
+  background: var(--amber); margin-left: 6px; vertical-align: -2px;
+  animation: ma-blink 1.1s steps(1) infinite;
+}
+@keyframes ma-blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+
+/* ---------- Phone: two-level drill-down ---------- */
+@media (max-width: 640px) {
+  .arcade { max-width: 460px; }
+  .arcade-body { padding: 20px 16px 24px; }
+
+  /* show the 4 big family buttons */
+  .family-nav { display: flex; flex-direction: column; gap: 12px; }
+  .fam-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    width: 100%;
+    padding: 20px 20px;
+    background: var(--panel-2);
+    border: 1px solid var(--hair);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .fam-btn .fam-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px; font-weight: 600; color: var(--text-bright);
+  }
+  .fam-btn .fam-meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--dim); margin-top: 7px;
+  }
+  .fam-btn .chev { font-size: 24px; color: var(--amber); }
+
+  /* hide nav once a family is open */
+  body.drill .family-nav { display: none; }
+
+  /* families hidden until opened */
+  .family { display: none; margin-bottom: 0; }
+  .family.open { display: block; }
+
+  .fam-back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 4px 12px;
+    border-bottom: 1px solid var(--hair);
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  .fam-back .arrow { font-size: 22px; color: var(--amber); }
+  .fam-back .lbl { font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 16px; color: var(--text-bright); }
+  .fam-back .count { margin-left: auto; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--dim-2); }
+
+  /* fade the directory title inside an open family */
+  .family.open .fam-title { display: none; }
+
+  /* big tap rows */
+  .topics { gap: 9px; }
+  a.topic {
+    padding: 16px 16px;
+    font-size: 16px;
+    background: var(--panel-2);
+    border: 1px solid var(--hair);
+    border-radius: 8px;
+  }
+  a.topic .tag { font-size: 11px; }
+
+  .arcade-prompt { display: none; }
+  #question { font-size: clamp(1.8rem, 9vw, 2.6rem); }
 }

@@ -6,66 +6,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Math Arcade</title>
   <link rel="stylesheet" href="css/style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <!-- favicon served as /favicon.ico from site root -->
-
 </head>
 
 <body>
-  <div class="site-header">
-    <h1>Math Arcade</h1>
-    <img src="logo.png" alt="Math Arcade Logo" class="logo">
-  </div>
-  <div class="section section--arithmetic">
-    <h2>Arithmetic</h2>
-    <div class="menu">
-      <a href="game.html?mode=addition">Addition</a>
-      <a href="game.html?mode=subtraction">Subtraction</a>
-      <a href="game.html?mode=integers">Integers (±)</a>
-      <a href="game.html?mode=multiplication">Multiplication</a>
-      <a href="game.html?mode=division">Division</a>
-      <a href="game.html?mode=percents">Percents</a>
-      <a href="game.html?mode=expressions">Expressions</a>
-      <a href="game.html?mode=lcm">LCM</a>
-      <a href="game.html?mode=gcf">GCF</a>
+  <div class="arcade">
+    <div class="arcade-bar">
+      <span class="dot on"></span><span class="dot"></span><span class="dot"></span>
+      <span class="path">matharcade — 80×24</span>
+    </div>
+
+    <div class="arcade-body">
+      <div class="brand">
+        <h1 class="brand-mark">MATH<br>ARCADE</h1>
+        <img src="logo.png" alt="Math Arcade" class="brand-logo">
+      </div>
+      <p class="brand-sub">20 drills across four families. Pick a track and the machine starts.</p>
+
+      <!-- Phone-only: pick a family first (big tap targets) -->
+      <nav class="family-nav">
+        <button class="fam-btn" data-target="fam-arithmetic">
+          <span><span class="fam-name">Arithmetic</span><span class="fam-meta">11 drills · addition → fractions</span></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="fam-btn" data-target="fam-algebra">
+          <span><span class="fam-name">Algebra</span><span class="fam-meta">2 drills · factoring, logs</span></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="fam-btn" data-target="fam-trig">
+          <span><span class="fam-name">Trigonometry</span><span class="fam-meta">6 drills · unit circle → mixed</span></span>
+          <span class="chev">›</span>
+        </button>
+        <button class="fam-btn" data-target="fam-logic">
+          <span><span class="fam-name">Logic</span><span class="fam-meta">1 drill · boolean expressions</span></span>
+          <span class="chev">›</span>
+        </button>
+      </nav>
+
+      <!-- ARITHMETIC -->
+      <section class="family" id="fam-arithmetic">
+        <div class="fam-back"><span class="arrow">‹</span><span class="lbl">Arithmetic</span><span class="count">11 drills</span></div>
+        <div class="fam-title">ARITHMETIC<span class="count">/ · 11</span></div>
+        <div class="topics">
+          <a class="topic" href="game.html?mode=addition"><span class="name">addition</span><span class="tag">lvl 1–9</span></a>
+          <a class="topic" href="game.html?mode=subtraction"><span class="name">subtraction</span><span class="tag">lvl 1–9</span></a>
+          <a class="topic" href="game.html?mode=integers"><span class="name">integers ±</span><span class="tag">lvl 1–9</span></a>
+          <a class="topic" href="game.html?mode=multiplication"><span class="name">multiplication</span><span class="tag">lvl 1–9</span></a>
+          <a class="topic" href="game.html?mode=division"><span class="name">division</span><span class="tag">lvl 1–9</span></a>
+          <a class="topic" href="game.html?mode=percents"><span class="name">percents</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=expressions"><span class="name">expressions</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=lcm"><span class="name">lcm</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=gcf"><span class="name">gcf</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=fractions_simplify"><span class="name">fractions · simplify</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=fractions_arithmetic"><span class="name">fractions · arithmetic</span><span class="tag">·</span></a>
+        </div>
+      </section>
+
+      <!-- ALGEBRA -->
+      <section class="family" id="fam-algebra">
+        <div class="fam-back"><span class="arrow">‹</span><span class="lbl">Algebra</span><span class="count">2 drills</span></div>
+        <div class="fam-title">ALGEBRA<span class="count">/ · 2</span></div>
+        <div class="topics">
+          <a class="topic" href="game.html?mode=factoring"><span class="name">factoring</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=logarithms"><span class="name">logarithms</span><span class="tag">·</span></a>
+        </div>
+      </section>
+
+      <!-- TRIGONOMETRY -->
+      <section class="family" id="fam-trig">
+        <div class="fam-back"><span class="arrow">‹</span><span class="lbl">Trigonometry</span><span class="count">6 drills</span></div>
+        <div class="fam-title">TRIGONOMETRY<span class="count">/ · 6</span></div>
+        <div class="topics">
+          <a class="topic" href="game.html?mode=unitcircle_click"><span class="name">unit circle</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=unitcircle"><span class="name">functions</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=inverse_trig"><span class="name">inverse functions</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=radians_to_degrees"><span class="name">radians → degrees</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=degrees_to_radians"><span class="name">degrees → radians</span><span class="tag">·</span></a>
+          <a class="topic" href="game.html?mode=mixed_trig"><span class="name">mixed practice</span><span class="tag">·</span></a>
+        </div>
+      </section>
+
+      <!-- LOGIC -->
+      <section class="family" id="fam-logic">
+        <div class="fam-back"><span class="arrow">‹</span><span class="lbl">Logic</span><span class="count">1 drill</span></div>
+        <div class="fam-title">LOGIC<span class="count">/ · 1</span></div>
+        <div class="topics">
+          <a class="topic" href="game.html?mode=logic"><span class="name">boolean expressions</span><span class="tag">·</span></a>
+        </div>
+      </section>
+
+      <div class="arcade-prompt">select<span class="caret"></span></div>
     </div>
   </div>
 
-  <div class="section section--fractions">
-    <h2>Fractions</h2>
-    <div class="menu">
-      <a href="game.html?mode=fractions_simplify">Simplify</a>
-      <a href="game.html?mode=fractions_arithmetic">Arithmetic</a>
-    </div>
-  </div>
+  <script>
+    // Two-level drill-down — active on phones (CSS controls visibility).
+    // On desktop every family is shown, so this is inert.
+    (function () {
+      const body = document.body;
+      const navButtons = document.querySelectorAll('.fam-btn');
+      const families = document.querySelectorAll('.family');
 
-  <div class="section section--algebra">
-    <h2>Algebra</h2>
-    <div class="menu">
-      <a href="game.html?mode=factoring">Factoring</a>
-      <a href="game.html?mode=logarithms">Logarithms</a>
-      <!-- add more algebra drills here -->
-    </div>
-  </div>
+      function openFamily(id) {
+        families.forEach(f => f.classList.toggle('open', f.id === id));
+        body.classList.add('drill');
+        window.scrollTo(0, 0);
+      }
+      function closeFamily() {
+        families.forEach(f => f.classList.remove('open'));
+        body.classList.remove('drill');
+        window.scrollTo(0, 0);
+      }
 
-  <div class="section section--trig">
-    <h2>Trigonometry</h2>
-    <div class="menu">
-      <a href="game.html?mode=unitcircle_click">Unit Circle</a>
-      <a href="game.html?mode=unitcircle">Functions</a>
-      <a href="game.html?mode=inverse_trig">Inverse Functions</a>
-      <a href="game.html?mode=radians_to_degrees">Radians to Degrees</a>
-      <a href="game.html?mode=degrees_to_radians">Degrees to Radians</a>
-      <a href="game.html?mode=mixed_trig">Mixed Practice</a>
-    </div>
-  </div>
-
-  <div class="section section--logic">
-    <h2>Logic</h2>
-    <div class="menu">
-      <a href="game.html?mode=logic">Boolean Expressions</a>
-    </div>
-  </div>
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => openFamily(btn.dataset.target));
+      });
+      document.querySelectorAll('.fam-back').forEach(b => {
+        b.addEventListener('click', closeFamily);
+      });
+    })();
+  </script>
 </body>
 
 </html>
