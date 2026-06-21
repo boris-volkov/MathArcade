@@ -343,6 +343,7 @@ body.factoring #answerGrid button,
   background: var(--panel);
   border-bottom: 1px solid var(--hair);
 }
+.bar-left { display: flex; align-items: center; gap: 10px; }
 .console-dots { display: inline-flex; gap: 7px; }
 .console-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; background: var(--hair-2); }
 .console-dots i.on { background: var(--amber); }
