@@ -495,14 +495,14 @@ body.factoring #answerGrid button,
 }
 .brand-mark {
   font-family: 'Press Start 2P', monospace;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.5;
   color: var(--amber);
   text-shadow: 0 0 12px rgba(255,176,0,.45);
   margin: 0;
 }
 .brand-logo {
-  width: 76px; height: 76px;
+  width: 91px; height: 91px;
   object-fit: cover;
   border-radius: 5px;
   border: 1px solid var(--hair);
