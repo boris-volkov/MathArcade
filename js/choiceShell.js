@@ -106,7 +106,7 @@ export function setupChoiceGame({
     const barSessionEl = document.getElementById('bar-session');
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    if (barSessionEl) barSessionEl.textContent = `${correct}/${total} · ${rate}/min`;
+    if (barSessionEl) barSessionEl.innerHTML = `<span class="stat-num">${correct}</span>/${total} · <span class="stat-num">${rate}</span>/min`;
 
     // Only switch once we've answered enough questions
     if (typeof generateQuestion.setUseAllFns === "function" && total >= MIN_TOTAL_FOR_RATE) {

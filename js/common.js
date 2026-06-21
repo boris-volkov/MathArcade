@@ -254,7 +254,7 @@ if (clearBtn) {
     const minutes = Math.max(0.001, (performance.now() - sessionStartAt) / 60000);
     const rate = correctCount / minutes;
     const rateDisp = rate < 10 ? rate.toFixed(1) : Math.round(rate);
-    barSessionEl.textContent = `${correctCount}/${totalCount} · ${rateDisp}/min`;
+    barSessionEl.innerHTML = `<span class="stat-num">${correctCount}</span>/${totalCount} · <span class="stat-num">${rateDisp}</span>/min`;
   }
 
 

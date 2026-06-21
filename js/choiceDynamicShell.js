@@ -57,7 +57,7 @@ export function setupDynamicChoiceGame({
     if (!barSessionEl) return;
     const elapsed = (performance.now() - start) / 1000;
     const rate = total ? ((correct / elapsed) * 60).toFixed(1) : 0;
-    barSessionEl.textContent = `${correct}/${total} · ${rate}/min`;
+    barSessionEl.innerHTML = `<span class="stat-num">${correct}</span>/${total} · <span class="stat-num">${rate}</span>/min`;
   }
 
   function buildForQuestion() {
