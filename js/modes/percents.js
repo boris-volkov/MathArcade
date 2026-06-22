@@ -73,4 +73,4 @@ generateQuestion.getLevel = () => level;
 generateQuestion.bumpUp = () => { level++; console.log("[Percents Level] +", level); };
 generateQuestion.bumpDown = () => { level = Math.max(1, level - 1); console.log("[Percents Level] -", level); };
 
-export default { generateQuestion, targetMs: 6000, uiType: "numpad" };
+export default { generateQuestion, targetMs: 6000, progressScale: 0.5, uiType: "numpad" };

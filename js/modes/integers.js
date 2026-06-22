@@ -32,4 +32,4 @@ generateQuestion.getLevel  = () => level;
 generateQuestion.bumpUp    = () => { level++; console.log("[Integers Level] +", level); };
 generateQuestion.bumpDown  = () => { level = Math.max(1, level - 1); console.log("[Integers Level] -", level); };
 
-export default { generateQuestion, targetMs: 5000, uiType: "numpad" };
+export default { generateQuestion, targetMs: 5000, progressScale: 0.5, uiType: "numpad" };

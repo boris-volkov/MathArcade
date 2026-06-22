@@ -169,9 +169,10 @@ if (clearBtn) {
     return t;
   }
   const EMA_ALPHA = 0.35;    // weight of the latest dt in EMA
-  const PROGRESS_GAIN = 0.2; // max speed bonus per answer (1/5 level)
-  const BASE_PROGRESS = 0.1; // base progress per correct answer (1/10 level)
-  const WRONG_GUESS_PENALTY = 0.125; // remove 1/8 level progress per wrong guess
+  const progressScale = Number.isFinite(config?.progressScale) ? config.progressScale : 1;
+  const PROGRESS_GAIN = 0.2 * progressScale;
+  const BASE_PROGRESS = 0.1 * progressScale;
+  const WRONG_GUESS_PENALTY = 0.125 * progressScale;
   const START_MIN_TOTAL = 6; // wait for a few answers before adapting
   const COOLDOWN_Q = 2;      // min questions between level changes
 
