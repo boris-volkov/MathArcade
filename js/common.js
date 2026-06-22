@@ -309,6 +309,7 @@ if (clearBtn) {
     totalCount++;
     updateStats();
     try {
+      if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
       localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
       localStorage.setItem('matharcade_total_correct',  (parseInt(localStorage.getItem('matharcade_total_correct'),  10) || 0) + 1);
     } catch {}
@@ -345,6 +346,7 @@ if (clearBtn) {
     totalCount++;
     updateStats();
     try {
+      if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
       localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
     } catch {}
   }

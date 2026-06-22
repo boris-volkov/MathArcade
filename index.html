@@ -134,9 +134,11 @@
     // Populate lifetime stats
     (function () {
       var answered = parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0;
+      var startDate = localStorage.getItem('matharcade_start_date');
       var counter = document.getElementById('bar-counter');
       if (answered > 0) {
-        counter.innerHTML = '<span class="stat-num">' + answered.toLocaleString() + '</span> problems solved';
+        var since = startDate ? ' · since ' + startDate : '';
+        counter.innerHTML = '<span class="stat-num">' + answered.toLocaleString() + '</span> problems solved' + since;
       } else {
         counter.textContent = 'no problems solved yet';
       }

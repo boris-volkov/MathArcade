@@ -97,6 +97,7 @@ export function setupDynamicChoiceGame({
 
 function onChoice(i, btn) {
     total++;
+    try { if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US')); } catch {}
     try { localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1); } catch {}
     if (i === currentCorrectIndex) {
       correct++;
