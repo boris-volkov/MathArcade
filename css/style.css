@@ -359,6 +359,11 @@ body.factoring #answerGrid button,
   padding: 30px 20px 24px;
   font-size: clamp(2rem, 7vw, 2.8rem);
 }
+/* Choice games can have long questions — keep them on one line */
+body.game.ui-choice .console #question {
+  font-size: clamp(1.3rem, 3.5vw, 2rem);
+  white-space: nowrap;
+}
 
 /* Answer row — full-width seamed bar with a prompt */
 .console #numpad-ui {
@@ -690,6 +695,8 @@ body.game {
 
   /* Numpad: question fills leftover vertical space above the pad */
   body.game.ui-numpad .console #question { flex: 1; }
+  /* Choice: tighter font so long questions (factoring) stay on one line */
+  body.game.ui-choice .console #question { font-size: clamp(1.1rem, 5vw, 1.6rem); white-space: nowrap; }
 
   /* Tighten numpad so it fits comfortably */
   body.game .console .numpad {
