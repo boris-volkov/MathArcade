@@ -179,7 +179,7 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       p.setAttribute('d', pathOf(arr));
       p.setAttribute('fill', 'none');
       p.setAttribute('stroke', colors[i]);
-      p.setAttribute('stroke-width', '2.5');
+      p.setAttribute('stroke-width', '1.5');
       p.setAttribute('stroke-linejoin', 'round');
       p.setAttribute('stroke-linecap', 'round');
       svg.appendChild(p);
