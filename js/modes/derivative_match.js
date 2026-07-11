@@ -31,6 +31,9 @@ function powerPair([p, q], hMin = -1.2, hMax = 1.2) {
     fp: x => c * (p / q) * rpow(x - h, p - q, q),
     domain: [-3, 3],
     yClip: [-4, 4],
+    refine: [h],
+    // f' has a vertical asymptote at h when its exponent (p−q)/q < 0
+    asymptotes: p - q < 0 ? [h] : [],
   };
 }
 
@@ -115,6 +118,8 @@ function generateQuestion() {
     correctIndex: flip ? 0 : 1,
     domain: fam.domain,
     yClip: fam.yClip,
+    refine: fam.refine,
+    asymptotes: fam.asymptotes,
   };
 }
 

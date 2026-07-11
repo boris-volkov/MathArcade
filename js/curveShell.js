@@ -1,10 +1,14 @@
 // curveShell.js — plots two related curves (A amber, B blue); player taps
 // the one the prompt asks for. Modes return:
-//   { prompt, curves: [fnA, fnB], correctIndex, domain: [x0, x1], yClip? }
+//   { prompt, curves: [fnA, fnB], correctIndex, domain: [x0, x1],
+//     yClip?, refine?, asymptotes? }
 // where fnA/fnB are plain JS functions sampled by the shell.
 // NaN/Infinity samples break the path (domain gaps, asymptotes); an
 // optional yClip: [lo, hi] bounds the auto-scale so asymptotic spikes
-// run off-canvas instead of flattening everything else.
+// run off-canvas instead of flattening everything else. refine lists
+// x-values that get extra geometrically-spaced samples (cusps,
+// singularities); asymptotes lists x-values drawn as dashed vertical
+// guide lines.
 
 export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 220 }) {
   if (typeof generateQuestion !== "function") {
@@ -33,6 +37,7 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     amber: cssVars.getPropertyValue('--amber').trim() || '#FFB000',
     blue: cssVars.getPropertyValue('--ray-blue').trim() || '#4a7a9b',
     hair: cssVars.getPropertyValue('--hair-2').trim() || '#3a3a3a',
+    dim: cssVars.getPropertyValue('--dim').trim() || '#8a8a8a',
   };
 
   // ----- level persistence (same key scheme as the numpad shell) -----
@@ -86,13 +91,23 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     const clipHi = q.yClip ? q.yClip[1] : Infinity;
     const inClip = y => Number.isFinite(y) && y >= clipLo && y <= clipHi;
     const N = 140;
-    const xs = [], ya = [], yb = [];
-    for (let i = 0; i <= N; i++) {
-      const x = x0 + (x1 - x0) * i / N;
-      xs.push(x);
-      ya.push(q.curves[0](x));
-      yb.push(q.curves[1](x));
+    const step = (x1 - x0) / N;
+    const xs = [];
+    for (let i = 0; i <= N; i++) xs.push(x0 + step * i);
+    // Geometrically-spaced extra samples closing in on cusps and
+    // singularities, so steep branches genuinely run off-canvas
+    // instead of stopping at the nearest uniform sample.
+    for (const r of (q.refine || [])) {
+      if (!(r > x0 && r < x1)) continue;
+      for (let k = 1; k <= 9; k++) {
+        const off = step / Math.pow(2, k);
+        xs.push(r - off, r + off);
+      }
     }
+    xs.sort((a, b) => a - b);
+    const M = xs.length - 1;
+    const ya = xs.map(x => q.curves[0](x));
+    const yb = xs.map(x => q.curves[1](x));
     // Scale only to values inside the clip window so asymptotic spikes
     // don't flatten the rest of the plot.
     let yMin = Infinity, yMax = -Infinity;
@@ -116,7 +131,7 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       let d = '';
       let pen = false;
       let prevY = 0;
-      for (let i = 0; i <= N; i++) {
+      for (let i = 0; i <= M; i++) {
         const y = arr[i];
         if (!Number.isFinite(y)) { pen = false; continue; }
         const Y = Math.max(-400, Math.min(H + 400, py(y)));
@@ -144,6 +159,18 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     }
     if (yMin < 0 && yMax > 0) axisLine(0, py(0), W, py(0));
     if (x0 < 0 && x1 > 0) axisLine(px(0), 0, px(0), H);
+
+    // Dashed vertical guides at true asymptotes — textbook style
+    for (const a of (q.asymptotes || [])) {
+      if (!(a >= x0 && a <= x1)) continue;
+      const l = document.createElementNS(svgNS, 'line');
+      l.setAttribute('x1', px(a)); l.setAttribute('y1', '0');
+      l.setAttribute('x2', px(a)); l.setAttribute('y2', String(H));
+      l.setAttribute('stroke', C.dim);
+      l.setAttribute('stroke-width', '1.2');
+      l.setAttribute('stroke-dasharray', '5,5');
+      svg.appendChild(l);
+    }
 
     // Curves
     const colors = [C.amber, C.blue];
@@ -176,10 +203,10 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       return -1;
     }
     function firstVisible(arr, from) {
-      for (let i = from; i <= N; i++) if (inClip(arr[i])) return i;
+      for (let i = from; i <= M; i++) if (inClip(arr[i])) return i;
       return -1;
     }
-    const iA = lastVisible(ya, N - 8);
+    const iA = lastVisible(ya, M - 8);
     const iB = firstVisible(yb, 8);
     if (iA >= 0) label('A', px(xs[iA]) - 4, Math.min(H - 6, Math.max(14, py(ya[iA]) - 8)), C.amber);
     if (iB >= 0) label('B', px(xs[iB]) - 4, Math.min(H - 6, Math.max(14, py(yb[iB]) - 8)), C.blue);
