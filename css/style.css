@@ -365,6 +365,36 @@ body.game.ui-choice .console #question {
   white-space: nowrap;
 }
 
+/* ---------- Curve game (calculus) ---------- */
+body.ui-curve .console #question {
+  font: 500 1rem/1.4 'IBM Plex Mono', monospace;
+  color: var(--dim);
+  padding: 16px 20px 4px;
+}
+#curve-ui { padding: 4px 18px 8px; }
+#curveMount svg { width: 100%; height: auto; display: block; max-height: 52vh; margin: 0 auto; }
+#curveAnswers { display: flex; gap: 14px; justify-content: center; margin: 12px auto 6px; }
+#curveAnswers .curve-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 1.4rem;
+  padding: 0.7rem 2.6rem;
+  background: var(--panel-2);
+  border: 1px solid var(--hair);
+  border-radius: 7px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  transition: background .1s ease, border-color .1s ease;
+}
+#curveAnswers .curve-a { color: var(--amber); }
+#curveAnswers .curve-b { color: var(--ray-blue); }
+#curveAnswers .curve-a:hover { border-color: var(--amber); }
+#curveAnswers .curve-b:hover { border-color: var(--ray-blue); }
+#curveAnswers .curve-a.active { background: var(--amber); border-color: var(--amber); color: var(--bg); }
+#curveAnswers .curve-b.active { background: var(--ray-blue); border-color: var(--ray-blue); color: var(--bg); }
+#curveAnswers .curve-btn.wrong { background: rgba(217,119,78,.25); border-color: var(--color-wrong); }
+
 /* Answer row — full-width seamed bar with a prompt */
 .console #numpad-ui {
   display: flex;
@@ -697,6 +727,8 @@ body.game {
   body.game.ui-numpad .console #question { flex: 1; }
   /* Choice: tighter font so long questions (factoring) stay on one line */
   body.game.ui-choice .console #question { font-size: clamp(1.1rem, 5vw, 1.6rem); white-space: nowrap; }
+  /* Curve: prompt is a short sentence, keep it small */
+  body.game.ui-curve .console #question { font-size: 0.95rem; }
 
   /* Tighten numpad so it fits comfortably */
   body.game .console .numpad {
@@ -720,9 +752,10 @@ body.game {
     font-size: 1.25rem;
   }
 
-  /* Choice and circle UIs fill remaining space too */
+  /* Choice, circle, and curve UIs fill remaining space too */
   body.game .console #choice-ui,
-  body.game .console #circle-ui {
+  body.game .console #circle-ui,
+  body.game .console #curve-ui {
     flex: 1;
     overflow-y: auto;
   }

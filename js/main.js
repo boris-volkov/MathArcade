@@ -28,6 +28,7 @@ const MODE_PATHS = {
   fractions_arithmetic: "./modes/fractions_arithmetic.js",
   fractions_add_sub: "./modes/fractions_add_sub.js",
   fractions_mul_div: "./modes/fractions_mul_div.js",
+  derivative_match: "./modes/derivative_match.js",
 };
 
 const MODE_TITLES = {
@@ -55,6 +56,7 @@ const MODE_TITLES = {
   fractions_arithmetic: "Fraction Arithmetic",
   fractions_add_sub: "Fractions · Add & Subtract",
   fractions_mul_div: "Fractions · Multiply & Divide",
+  derivative_match: "Spot the Derivative",
 };
 
 function modeToTitle(modeKey) {
@@ -93,6 +95,9 @@ async function boot() {
     } else if (uiType === 'circle') {
       const { setupCircleGame } = await import('./circleShell.js');
       setupCircleGame(cfg);
+    } else if (uiType === 'curve') {
+      const { setupCurveGame } = await import('./curveShell.js');
+      setupCurveGame(cfg);
     } else {
       throw new Error(`Unknown uiType "${uiType}"`);
     }
