@@ -1,7 +1,10 @@
 // curveShell.js — plots two related curves (A amber, B blue); player taps
 // the one the prompt asks for. Modes return:
-//   { prompt, curves: [fnA, fnB], correctIndex, domain: [x0, x1] }
+//   { prompt, curves: [fnA, fnB], correctIndex, domain: [x0, x1], yClip? }
 // where fnA/fnB are plain JS functions sampled by the shell.
+// NaN/Infinity samples break the path (domain gaps, asymptotes); an
+// optional yClip: [lo, hi] bounds the auto-scale so asymptotic spikes
+// run off-canvas instead of flattening everything else.
 
 export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 220 }) {
   if (typeof generateQuestion !== "function") {
@@ -79,6 +82,9 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
 
   function draw(q) {
     const [x0, x1] = q.domain;
+    const clipLo = q.yClip ? q.yClip[0] : -Infinity;
+    const clipHi = q.yClip ? q.yClip[1] : Infinity;
+    const inClip = y => Number.isFinite(y) && y >= clipLo && y <= clipHi;
     const N = 140;
     const xs = [], ya = [], yb = [];
     for (let i = 0; i <= N; i++) {
@@ -87,10 +93,12 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       ya.push(q.curves[0](x));
       yb.push(q.curves[1](x));
     }
+    // Scale only to values inside the clip window so asymptotic spikes
+    // don't flatten the rest of the plot.
     let yMin = Infinity, yMax = -Infinity;
     for (const arr of [ya, yb]) {
       for (const y of arr) {
-        if (Number.isFinite(y)) { yMin = Math.min(yMin, y); yMax = Math.max(yMax, y); }
+        if (inClip(y)) { yMin = Math.min(yMin, y); yMax = Math.max(yMax, y); }
       }
     }
     if (!(yMax > yMin)) { yMin = -1; yMax = 1; }
@@ -99,7 +107,26 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
 
     const px = x => PAD + (x - x0) / (x1 - x0) * (W - 2 * PAD);
     const py = y => H - PAD - (y - yMin) / (yMax - yMin) * (H - 2 * PAD);
-    const pathOf = arr => arr.map((y, i) => `${i ? 'L' : 'M'}${px(xs[i]).toFixed(1)},${py(y).toFixed(1)}`).join('');
+    // Break the path at undefined samples; clamp huge values so
+    // asymptotes draw as near-vertical strokes running off-canvas.
+    // A jump bigger than the whole canvas means the curve crossed a
+    // two-sided asymptote (−∞ to +∞) — break rather than join branches.
+    const JUMP = H * 1.2;
+    const pathOf = arr => {
+      let d = '';
+      let pen = false;
+      let prevY = 0;
+      for (let i = 0; i <= N; i++) {
+        const y = arr[i];
+        if (!Number.isFinite(y)) { pen = false; continue; }
+        const Y = Math.max(-400, Math.min(H + 400, py(y)));
+        if (pen && Math.abs(Y - prevY) > JUMP) pen = false;
+        d += `${pen ? 'L' : 'M'}${px(xs[i]).toFixed(1)},${Y.toFixed(1)}`;
+        pen = true;
+        prevY = Y;
+      }
+      return d;
+    };
 
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
@@ -131,7 +158,9 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       svg.appendChild(p);
     });
 
-    // Letter labels near each curve (A right end, B left end)
+    // Letter labels near each curve (A toward the right end, B toward the
+    // left) — anchored to the nearest visible sample so gaps and clipped
+    // spikes don't strand a label on an undefined point.
     function label(txt, x, y, color) {
       const t = document.createElementNS(svgNS, 'text');
       t.setAttribute('x', x); t.setAttribute('y', y);
@@ -142,9 +171,18 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
       t.textContent = txt;
       svg.appendChild(t);
     }
-    const iA = N - 8, iB = 8;
-    label('A', px(xs[iA]) - 4, Math.min(H - 6, Math.max(14, py(ya[iA]) - 8)), C.amber);
-    label('B', px(xs[iB]) - 4, Math.min(H - 6, Math.max(14, py(yb[iB]) - 8)), C.blue);
+    function lastVisible(arr, from) {
+      for (let i = from; i >= 0; i--) if (inClip(arr[i])) return i;
+      return -1;
+    }
+    function firstVisible(arr, from) {
+      for (let i = from; i <= N; i++) if (inClip(arr[i])) return i;
+      return -1;
+    }
+    const iA = lastVisible(ya, N - 8);
+    const iB = firstVisible(yb, 8);
+    if (iA >= 0) label('A', px(xs[iA]) - 4, Math.min(H - 6, Math.max(14, py(ya[iA]) - 8)), C.amber);
+    if (iB >= 0) label('B', px(xs[iB]) - 4, Math.min(H - 6, Math.max(14, py(yb[iB]) - 8)), C.blue);
 
     mount.innerHTML = '';
     mount.appendChild(svg);

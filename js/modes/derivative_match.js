@@ -10,6 +10,30 @@ function pick(arr) { return arr[ri(0, arr.length - 1)]; }
 function rf(min, max) { return min + Math.random() * (max - min); }
 function rsign() { return Math.random() < 0.5 ? -1 : 1; }
 
+// x^(p/q) for integer p, q — real-valued where it exists:
+// even q → undefined (NaN) for x < 0; odd q → signed real root.
+function rpow(x, p, q) {
+  if (q % 2 === 0) {
+    if (x < 0) return NaN;
+    return Math.pow(x, p / q);
+  }
+  const s = (x < 0 && p % 2 !== 0) ? -1 : 1;
+  return s * Math.pow(Math.abs(x), p / q);
+}
+
+// f = c·(x−h)^(p/q), f' = c·(p/q)·(x−h)^((p−q)/q). The exponent parity
+// decides the feature at x = h: cusp, vertical tangent, or domain edge.
+function powerPair([p, q], hMin = -1.2, hMax = 1.2) {
+  const c = rsign() * rf(0.8, 1.6);
+  const h = rf(hMin, hMax);
+  return {
+    f: x => c * rpow(x - h, p, q),
+    fp: x => c * (p / q) * rpow(x - h, p - q, q),
+    domain: [-3, 3],
+    yClip: [-4, 4],
+  };
+}
+
 const FAMILIES = {
   // f' drops a degree — visually distinct shapes
   quad() {
@@ -55,15 +79,31 @@ const FAMILIES = {
       domain: [-3, 3],
     };
   },
+  // even/odd exponent: f has a cusp, f' a two-sided vertical asymptote
+  cuspEvenOdd() {
+    return powerPair(pick([[2, 3], [2, 5], [4, 5]]));
+  },
+  // odd/odd, p < q: f has a vertical tangent, f' a one-signed spike
+  vertOddOdd() {
+    return powerPair(pick([[1, 3], [1, 5], [3, 5]]));
+  },
+  // odd/odd, p > q: f looks smooth but f' has the cusp
+  cuspDeriv() {
+    return powerPair(pick([[5, 3], [7, 5]]));
+  },
+  // odd/even: even root — both curves only exist for x ≥ h
+  halfDomain() {
+    return powerPair(pick([[1, 2], [3, 2]]), -2, 0.5);
+  },
 };
 
 function familiesForLevel(lv) {
   if (lv <= 1) return ['quad', 'cubic'];
   if (lv <= 2) return ['quad', 'cubic', 'quartic'];
-  if (lv <= 3) return ['cubic', 'quartic', 'sine', 'cosine'];
-  if (lv <= 4) return ['quartic', 'sine', 'cosine'];
-  if (lv <= 5) return ['sine', 'cosine', 'gaussian'];
-  return ['sine', 'cosine', 'gaussian', 'damped', 'expx'];
+  if (lv <= 3) return ['sine', 'cosine', 'cuspEvenOdd', 'halfDomain'];
+  if (lv <= 4) return ['sine', 'cosine', 'vertOddOdd', 'cuspEvenOdd', 'halfDomain'];
+  if (lv <= 5) return ['gaussian', 'cuspDeriv', 'vertOddOdd', 'cuspEvenOdd'];
+  return ['sine', 'cosine', 'gaussian', 'damped', 'expx', 'cuspEvenOdd', 'vertOddOdd', 'cuspDeriv', 'halfDomain'];
 }
 
 function generateQuestion() {
@@ -74,6 +114,7 @@ function generateQuestion() {
     curves: flip ? [fam.fp, fam.f] : [fam.f, fam.fp],
     correctIndex: flip ? 0 : 1,
     domain: fam.domain,
+    yClip: fam.yClip,
   };
 }
 
