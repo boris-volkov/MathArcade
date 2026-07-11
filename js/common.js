@@ -31,10 +31,11 @@ export function setupGame(config) {
   const SHOW_LEVEL_FOR = new Set([
     'addition', 'subtraction', 'multiplication', 'division', 'percents', 'lcm', 'gcf', 'integers',
     'logic', 'expressions', 'fractions_simplify', 'fractions_arithmetic', 'fractions_add_sub', 'fractions_mul_div',
+    'fractions_of', 'fractions_what',
   ]);
   const showLevelUI = SHOW_LEVEL_FOR.has(mode);
 
-  if (new Set(['fractions_simplify', 'fractions_arithmetic', 'fractions_add_sub', 'fractions_mul_div']).has(mode)) {
+  if (new Set(['fractions_simplify', 'fractions_arithmetic', 'fractions_add_sub', 'fractions_mul_div', 'fractions_what']).has(mode)) {
     document.body.classList.add('fraction-mode');
   }
 
