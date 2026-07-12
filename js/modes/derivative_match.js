@@ -69,9 +69,11 @@ const FAMILIES = {
       domain: [-3, 3],
     };
   },
-  // f' = a·f: a scaled twin of itself — the hardest read
+  // f' = a·f: decaying only — growing exponentials leave both curves
+  // positive and same-shaped (indistinguishable); decay puts f' below
+  // the axis (negative) while f stays above it, so there's a real tell.
   expx() {
-    const a = rsign() * pick([rf(0.45, 0.7), rf(1.4, 1.8)]);
+    const a = -pick([rf(0.45, 0.7), rf(1.4, 1.8)]);
     return { f: x => Math.exp(a * x), fp: x => a * Math.exp(a * x), domain: [-2, 2] };
   },
   damped() {

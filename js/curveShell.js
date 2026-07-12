@@ -92,11 +92,30 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     const inClip = y => Number.isFinite(y) && y >= clipLo && y <= clipHi;
     const N = 140;
     const step = (x1 - x0) / N;
-    const xs = [];
-    for (let i = 0; i <= N; i++) xs.push(x0 + step * i);
+    const baseXs = [];
+    for (let i = 0; i <= N; i++) baseXs.push(x0 + step * i);
+    // The auto-scale is set from the coarse uniform grid only. Refine
+    // samples (below) deliberately approach singularities and can take
+    // on moderately large values that would otherwise sneak inside the
+    // clip window and stretch the scale, squashing the rest of the
+    // curve and making the approach look like a steep diagonal instead
+    // of a true break. Keeping the scale independent of them guarantees
+    // singular values land far outside the visible range.
+    let yMin = Infinity, yMax = -Infinity;
+    for (const fn of q.curves) {
+      for (const x of baseXs) {
+        const y = fn(x);
+        if (inClip(y)) { yMin = Math.min(yMin, y); yMax = Math.max(yMax, y); }
+      }
+    }
+    if (!(yMax > yMin)) { yMin = -1; yMax = 1; }
+    const padY = (yMax - yMin) * 0.12 || 1;
+    yMin -= padY; yMax += padY;
+
     // Geometrically-spaced extra samples closing in on cusps and
     // singularities, so steep branches genuinely run off-canvas
     // instead of stopping at the nearest uniform sample.
+    const xs = baseXs.slice();
     for (const r of (q.refine || [])) {
       if (!(r > x0 && r < x1)) continue;
       for (let k = 1; k <= 9; k++) {
@@ -108,25 +127,14 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     const M = xs.length - 1;
     const ya = xs.map(x => q.curves[0](x));
     const yb = xs.map(x => q.curves[1](x));
-    // Scale only to values inside the clip window so asymptotic spikes
-    // don't flatten the rest of the plot.
-    let yMin = Infinity, yMax = -Infinity;
-    for (const arr of [ya, yb]) {
-      for (const y of arr) {
-        if (inClip(y)) { yMin = Math.min(yMin, y); yMax = Math.max(yMax, y); }
-      }
-    }
-    if (!(yMax > yMin)) { yMin = -1; yMax = 1; }
-    const padY = (yMax - yMin) * 0.12 || 1;
-    yMin -= padY; yMax += padY;
 
     const px = x => PAD + (x - x0) / (x1 - x0) * (W - 2 * PAD);
     const py = y => H - PAD - (y - yMin) / (yMax - yMin) * (H - 2 * PAD);
     // Break the path at undefined samples; clamp huge values so
     // asymptotes draw as near-vertical strokes running off-canvas.
-    // A jump bigger than the whole canvas means the curve crossed a
-    // two-sided asymptote (−∞ to +∞) — break rather than join branches.
-    const JUMP = H * 1.2;
+    // A jump spanning the visible plot height means the curve crossed
+    // a singularity — break rather than join the branches.
+    const JUMP = H * 0.9;
     const pathOf = arr => {
       let d = '';
       let pen = false;
