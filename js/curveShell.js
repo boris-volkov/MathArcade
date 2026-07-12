@@ -221,7 +221,7 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
     const btn = document.createElement('button');
     btn.className = 'curve-btn ' + (i === 0 ? 'curve-a' : 'curve-b');
     btn.textContent = letter;
-    btn.addEventListener('click', () => onPick(i, btn));
+    btn.addEventListener('click', () => { onPick(i, btn); btn.blur(); });
     answersEl.appendChild(btn);
     return btn;
   });

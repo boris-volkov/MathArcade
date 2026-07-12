@@ -386,6 +386,8 @@ body.ui-curve .console #question {
   user-select: none;
   touch-action: manipulation;
   transition: background .1s ease, border-color .1s ease;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 #curveAnswers .curve-a { color: var(--amber); }
 #curveAnswers .curve-b { color: var(--ray-blue); }
