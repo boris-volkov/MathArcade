@@ -1,4 +1,6 @@
 // js/choiceDynamicShell.js
+import { progressStorage } from "./storage.js";
+
 export function setupDynamicChoiceGame({
   // returns: { questionLatex, choicesLatex: string[], correctIndex: number }
   generateQuestion,
@@ -97,11 +99,11 @@ export function setupDynamicChoiceGame({
 
 function onChoice(i, btn) {
     total++;
-    try { if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US')); } catch {}
-    try { localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1); } catch {}
+    try { if (!progressStorage.getItem('matharcade_start_date')) progressStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US')); } catch {}
+    try { progressStorage.setItem('matharcade_total_answered', (parseInt(progressStorage.getItem('matharcade_total_answered'), 10) || 0) + 1); } catch {}
     if (i === currentCorrectIndex) {
       correct++;
-      try { localStorage.setItem('matharcade_total_correct', (parseInt(localStorage.getItem('matharcade_total_correct'), 10) || 0) + 1); } catch {}
+      try { progressStorage.setItem('matharcade_total_correct', (parseInt(progressStorage.getItem('matharcade_total_correct'), 10) || 0) + 1); } catch {}
       if (btn) flash(btn);
       feedbackEl.textContent = "Correct!";
       feedbackEl.style.color = "#2e7d32";

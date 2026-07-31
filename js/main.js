@@ -1,4 +1,14 @@
 import { setupGame } from "./common.js";
+import { isGuestMode, setGuestMode } from "./storage.js";
+
+if (isGuestMode()) {
+  const badge = document.getElementById('guestBadge');
+  if (badge) badge.style.display = '';
+}
+document.getElementById('guestExit')?.addEventListener('click', () => {
+  setGuestMode(false);
+  location.href = 'index.html';
+});
 
 const params = new URLSearchParams(location.search);
 const mode = (params.get("mode") || "multiplication").toLowerCase();

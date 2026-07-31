@@ -14,6 +14,7 @@
     <div class="arcade-bar">
       <span class="bar-label">stats:</span>
       <span class="path" id="bar-counter">—</span>
+      <button class="guest-toggle" id="guestToggle" type="button">play as guest</button>
     </div>
 
     <div class="arcade-body">
@@ -145,21 +146,31 @@
       });
     })();
 
-    // Populate lifetime stats
-    (function () {
+  </script>
+
+  <script type="module">
+    import { isGuestMode, setGuestMode } from './js/storage.js';
+
+    const guestActive = isGuestMode();
+    const counter = document.getElementById('bar-counter');
+    const toggle = document.getElementById('guestToggle');
+
+    if (guestActive) {
+      counter.textContent = 'guest mode — nothing will be saved';
+      toggle.textContent = 'exit guest mode';
+      toggle.classList.add('active');
+    } else {
+      // Populate lifetime stats
       var answered = parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0;
       var startDate = localStorage.getItem('matharcade_start_date');
-      var counter = document.getElementById('bar-counter');
       if (answered > 0) {
         var since = startDate ? ' · since ' + startDate : '';
         counter.innerHTML = '<span class="stat-num">' + answered.toLocaleString() + '</span> problems solved' + since;
       } else {
         counter.textContent = 'no problems solved yet';
       }
-    })();
 
-    // Show each player's saved level next to leveled drill links
-    (function () {
+      // Show each player's saved level next to leveled drill links
       document.querySelectorAll('a.topic').forEach(function (link) {
         var match = (link.getAttribute('href') || '').match(/[?&]mode=([^&]+)/);
         if (!match) return;
@@ -168,7 +179,12 @@
         var tag = link.querySelector('.tag');
         if (tag) { tag.textContent = 'lvl ' + saved; tag.classList.add('tag-lvl'); }
       });
-    })();
+    }
+
+    toggle.addEventListener('click', () => {
+      setGuestMode(!guestActive);
+      location.reload();
+    });
   </script>
 </body>
 

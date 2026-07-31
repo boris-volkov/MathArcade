@@ -1,4 +1,5 @@
 import { gcd, lcm } from "./utils.js";
+import { progressStorage } from "./storage.js";
 
 // Helpers available to modes
 export const math = { gcd, lcm };
@@ -310,9 +311,9 @@ if (clearBtn) {
     totalCount++;
     updateStats();
     try {
-      if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
-      localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
-      localStorage.setItem('matharcade_total_correct',  (parseInt(localStorage.getItem('matharcade_total_correct'),  10) || 0) + 1);
+      if (!progressStorage.getItem('matharcade_start_date')) progressStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
+      progressStorage.setItem('matharcade_total_answered', (parseInt(progressStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
+      progressStorage.setItem('matharcade_total_correct',  (parseInt(progressStorage.getItem('matharcade_total_correct'),  10) || 0) + 1);
     } catch {}
     if (typeof generateQuestion.bumpUp === "function") {
       totalAnswered++;
@@ -347,8 +348,8 @@ if (clearBtn) {
     totalCount++;
     updateStats();
     try {
-      if (!localStorage.getItem('matharcade_start_date')) localStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
-      localStorage.setItem('matharcade_total_answered', (parseInt(localStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
+      if (!progressStorage.getItem('matharcade_start_date')) progressStorage.setItem('matharcade_start_date', new Date().toLocaleDateString('en-US'));
+      progressStorage.setItem('matharcade_total_answered', (parseInt(progressStorage.getItem('matharcade_total_answered'), 10) || 0) + 1);
     } catch {}
   }
 
@@ -488,7 +489,7 @@ if (clearBtn) {
   const SAVE_KEY = `matharcade_level_${mode}`;
   if (typeof generateQuestion.bumpUp === 'function' && typeof generateQuestion.getLevel === 'function') {
     // Restore saved level by fast-forwarding bumpUp
-    const saved = parseInt(localStorage.getItem(SAVE_KEY), 10);
+    const saved = parseInt(progressStorage.getItem(SAVE_KEY), 10);
     if (Number.isFinite(saved) && saved > 1) {
       const start = generateQuestion.getLevel();
       for (let i = start; i < saved; i++) generateQuestion.bumpUp();
@@ -498,12 +499,12 @@ if (clearBtn) {
     const origDown = generateQuestion.bumpDown;
     generateQuestion.bumpUp = () => {
       origUp();
-      localStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+      progressStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
     };
     if (typeof origDown === 'function') {
       generateQuestion.bumpDown = () => {
         origDown();
-        localStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+        progressStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
       };
     }
   }
