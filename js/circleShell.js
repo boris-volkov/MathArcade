@@ -1,5 +1,6 @@
 // circleShell.js — SVG unit circle with clickable points
 // Expects a mode default export with { generateQuestion } that returns { questionLatex, answerIndex }
+import { fitQuestion } from "./utils.js";
 
 export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   if (typeof generateQuestion !== "function") {
@@ -335,6 +336,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
     qEl.innerHTML = "";
     try { katex.render(q.questionLatex, qEl, { throwOnError: false }); }
     catch { qEl.textContent = q.questionLatex; }
+    fitQuestion(qEl);
     feedbackEl.textContent = "";
     normalizeRays();
     resetHighlight();

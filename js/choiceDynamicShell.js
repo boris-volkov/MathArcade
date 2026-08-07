@@ -1,5 +1,6 @@
 // js/choiceDynamicShell.js
 import { progressStorage } from "./storage.js";
+import { fitQuestion } from "./utils.js";
 
 export function setupDynamicChoiceGame({
   // returns: { questionLatex, choicesLatex: string[], correctIndex: number }
@@ -81,6 +82,7 @@ export function setupDynamicChoiceGame({
 
     // render question
     katexRender(qEl, questionLatex);
+    fitQuestion(qEl);
 
     // rebuild choices
     $$("#answerGrid button").forEach(b => b.remove());

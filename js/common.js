@@ -1,4 +1,4 @@
-import { gcd, lcm } from "./utils.js";
+import { gcd, lcm, fitQuestion } from "./utils.js";
 import { progressStorage } from "./storage.js";
 
 // Helpers available to modes
@@ -120,6 +120,7 @@ if (clearBtn) {
     } else {
       questionEl.textContent = text ?? (latex ? String(latex) : "");
     }
+    fitQuestion(questionEl);
     answerEl.value = "";
     answerEl.placeholder = "";
     feedbackEl.textContent = "";

@@ -1,4 +1,6 @@
 // choiceShell.js – shared UI for multiple-choice / grid-answer games
+import { fitQuestion } from "./utils.js";
+
 export function setupChoiceGame({
   // returns { questionLatex, answerLatex }
   generateQuestion,
@@ -140,6 +142,7 @@ export function setupChoiceGame({
     qEl.innerHTML = "";
     try { katex.render(questionLatex, qEl, { throwOnError: false }); }
     catch { qEl.textContent = questionLatex; }
+    fitQuestion(qEl);
 
     feedbackEl.textContent = "";
   }
