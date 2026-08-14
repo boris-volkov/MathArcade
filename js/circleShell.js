@@ -1,6 +1,7 @@
 // circleShell.js — SVG unit circle with clickable points
 // Expects a mode default export with { generateQuestion } that returns { questionLatex, answerIndex }
 import { fitQuestion } from "./utils.js";
+import { loadLevelState, saveLevelState } from "./storage.js";
 
 export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   if (typeof generateQuestion !== "function") {
@@ -354,6 +355,23 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
   let progress = 0;            // fractional progress toward next level change
   let lastChangeAtTotal = -9999; // index when last change occurred
 
+  // Restore level and position within it (this shell used to start from
+  // scratch every session).
+  const mode = (new URLSearchParams(location.search).get('mode') || '').toLowerCase();
+  const hasLevels = typeof generateQuestion.bumpUp === "function"
+    && typeof generateQuestion.bumpDown === "function"
+    && typeof generateQuestion.getLevel === "function";
+  if (hasLevels) {
+    const saved = loadLevelState(mode);
+    if (saved.level && saved.level > 1) {
+      for (let i = Number(generateQuestion.getLevel()); i < saved.level; i++) generateQuestion.bumpUp();
+    }
+    if (saved.level) progress = saved.progress;
+  }
+  function saveLevel() {
+    if (hasLevels) saveLevelState(mode, Number(generateQuestion.getLevel()), progress);
+  }
+
   function onPick(idx, dotEl) {
     if (idx === answerIndex) {
       feedbackEl.textContent = "Correct!";
@@ -382,6 +400,7 @@ export function setupCircleGame({ generateQuestion, nextDelayMs = 300 }) {
           }
           console.log(`[Pace] dt=${dt.toFixed(0)}ms ema=${emaDt.toFixed(0)} inc=${inc.toFixed(2)} prog=${progress.toFixed(2)}`);
         }
+        saveLevel();
       }
       setTimeout(setQuestion, nextDelayMs);
     } else {

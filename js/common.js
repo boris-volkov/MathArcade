@@ -1,5 +1,5 @@
 import { gcd, lcm, fitQuestion } from "./utils.js";
-import { progressStorage } from "./storage.js";
+import { progressStorage, loadLevelState, saveLevelState } from "./storage.js";
 
 // Helpers available to modes
 export const math = { gcd, lcm };
@@ -184,6 +184,8 @@ if (clearBtn) {
   let emaDt = null;          // exponential moving average of dt
   let progress = 0;          // fractional progress toward next level change
   let lastChangeAtTotal = -9999; // index of totalAnswered when last level changed
+  // Wired up below once we know the mode has a level API; saves level+progress.
+  let persistLevelState = () => {};
 
   function applyWrongGuessPenalty() {
     // No leveling API available: nothing to penalize beyond visual stats.
@@ -216,6 +218,7 @@ if (clearBtn) {
     }
 
     updateLevelIndicator();
+    persistLevelState();
   }
 
   function updateLevelIndicator() {
@@ -334,6 +337,7 @@ if (clearBtn) {
         progress -= 1;
         lastChangeAtTotal = totalAnswered;
       }
+      persistLevelState();
     }
     if (nextTimer) clearTimeout(nextTimer);
     nextTimer = setTimeout(() => { nextTimer = null; newQuestion(); }, nextDelayMs);
@@ -486,28 +490,30 @@ if (clearBtn) {
     }
   });
 
-  // Persist level across sessions via localStorage
-  const SAVE_KEY = `matharcade_level_${mode}`;
+  // Persist level (and how far into it) across sessions via localStorage
   if (typeof generateQuestion.bumpUp === 'function' && typeof generateQuestion.getLevel === 'function') {
+    const saved = loadLevelState(mode);
     // Restore saved level by fast-forwarding bumpUp
-    const saved = parseInt(progressStorage.getItem(SAVE_KEY), 10);
-    if (Number.isFinite(saved) && saved > 1) {
+    if (saved.level && saved.level > 1) {
       const start = generateQuestion.getLevel();
-      for (let i = start; i < saved; i++) generateQuestion.bumpUp();
+      for (let i = start; i < saved.level; i++) generateQuestion.bumpUp();
     }
+    // Resume mid-level rather than at an empty bar
+    if (saved.level) progress = Math.max(0, saved.progress);
     // Wrap bumpUp/bumpDown to auto-save on every level change
     const origUp = generateQuestion.bumpUp;
     const origDown = generateQuestion.bumpDown;
     generateQuestion.bumpUp = () => {
       origUp();
-      progressStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+      saveLevelState(mode, Number(generateQuestion.getLevel()), progress);
     };
     if (typeof origDown === 'function') {
       generateQuestion.bumpDown = () => {
         origDown();
-        progressStorage.setItem(SAVE_KEY, generateQuestion.getLevel());
+        saveLevelState(mode, Number(generateQuestion.getLevel()), progress);
       };
     }
+    persistLevelState = () => saveLevelState(mode, Number(generateQuestion.getLevel()), progress);
   }
 
   newQuestion();

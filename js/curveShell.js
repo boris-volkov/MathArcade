@@ -10,7 +10,7 @@
 // singularities); asymptotes lists x-values drawn as dashed vertical
 // guide lines.
 
-import { progressStorage } from "./storage.js";
+import { progressStorage, loadLevelState, saveLevelState } from "./storage.js";
 
 export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 220 }) {
   if (typeof generateQuestion !== "function") {
@@ -45,25 +45,29 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
   // ----- level persistence (same key scheme as the numpad shell) -----
   const params = new URLSearchParams(location.search);
   const mode = (params.get('mode') || '').toLowerCase();
-  const SAVE_KEY = `matharcade_level_${mode}`;
   const hasLevels = typeof generateQuestion.bumpUp === 'function'
     && typeof generateQuestion.bumpDown === 'function'
     && typeof generateQuestion.getLevel === 'function';
-
-  if (hasLevels) {
-    const saved = parseInt(progressStorage.getItem(SAVE_KEY), 10);
-    if (Number.isFinite(saved) && saved > 1) {
-      for (let i = generateQuestion.getLevel(); i < saved; i++) generateQuestion.bumpUp();
-    }
-  }
-  function saveLevel() {
-    try { progressStorage.setItem(SAVE_KEY, String(generateQuestion.getLevel())); } catch {}
-  }
 
   // Streak-based leveling: 3 straight correct → level up, 2 straight wrong → level down
   const WIN_STREAK = 3;
   const LOSS_STREAK = 2;
   let winStreak = 0, lossStreak = 0;
+
+  if (hasLevels) {
+    const saved = loadLevelState(mode);
+    if (saved.level && saved.level > 1) {
+      for (let i = generateQuestion.getLevel(); i < saved.level; i++) generateQuestion.bumpUp();
+    }
+    // Restore the win streak the bar was showing when they left.
+    if (saved.level) {
+      winStreak = Math.min(WIN_STREAK - 1, Math.max(0, Math.round(saved.progress * WIN_STREAK)));
+    }
+  }
+  function saveLevel() {
+    if (!hasLevels) return;
+    saveLevelState(mode, Number(generateQuestion.getLevel()), winStreak / WIN_STREAK);
+  }
 
   function updateProgress() {
     if (!hasLevels || !progressBarEl) return;
@@ -278,8 +282,8 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
         if (winStreak >= WIN_STREAK) {
           generateQuestion.bumpUp();
           winStreak = 0;
-          saveLevel();
         }
+        saveLevel();
       }
       updateStats();
       updateProgress();
@@ -290,12 +294,10 @@ export function setupCurveGame({ generateQuestion, nextDelayMs = 500, flashMs = 
         winStreak = 0;
         lossStreak++;
         if (lossStreak >= LOSS_STREAK) {
-          if (generateQuestion.getLevel() > 1) {
-            generateQuestion.bumpDown();
-            saveLevel();
-          }
+          if (generateQuestion.getLevel() > 1) generateQuestion.bumpDown();
           lossStreak = 0;
         }
+        saveLevel();
       }
       updateStats();
       updateProgress();
